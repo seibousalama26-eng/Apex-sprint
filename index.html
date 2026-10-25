@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Sprint</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F5F5F2;--card:#fff;--ink:#0F1115;--mut:#5b6068;--line:#dcdcd6;--or:#FF5A1F;--g:#1a8f4c;--o:#b86100;--r:#c93434;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1115;--card:#181b21;--ink:#F5F5F2;--mut:#9aa0a6;--line:#2a2e36;--g:#2ECC71;--o:#F5A524;--r:#FF6B6B}}
+:root[data-theme="dark"]{--bg:#0F1115;--card:#181b21;--ink:#F5F5F2;--mut:#9aa0a6;--line:#2a2e36;--g:#2ECC71;--o:#F5A524;--r:#FF6B6B}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Inter,system-ui,sans-serif}
+.w{max-width:520px;margin:0 auto;padding:16px 16px 90px}
+h1,h2,.brand{font-family:"Barlow Condensed","Arial Narrow",Impact,sans-serif;font-weight:700;letter-spacing:.02em;margin:0}
+h1{font-size:34px;line-height:1.05}h2{font-size:24px;margin:22px 0 8px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:14px}.brand{font-size:22px;letter-spacing:.12em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.mut{color:var(--mut);font-size:15px}
+label.f{display:block;margin:12px 0 4px;font-weight:500;font-size:14px}
+input[type=text],input[type=number],select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin-top:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.chip,.seg{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 13px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer}
+.seg{flex:1;text-align:center;border-radius:10px;font-weight:600}
+.chip.on,.seg.on{background:var(--or);border-color:var(--or);color:#0F1115;font-weight:600}
+.chip.sw.on{background:var(--g);border-color:var(--g)}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:var(--or);color:#0F1115;font:700 17px "Barlow Condensed",sans-serif;letter-spacing:.06em;cursor:pointer;margin-top:14px}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.err{color:var(--r);font-size:14px;margin-top:8px;min-height:18px}
+.q{margin:14px 0}.qh{display:flex;justify-content:space-between;font-weight:500}.ql{display:flex;justify-content:space-between;font-size:12px;color:var(--mut)}
+input[type=range]{width:100%;accent-color:var(--or)}
+.nav{position:sticky;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav button{flex:1;padding:14px 2px;border:0;background:none;color:var(--mut);font:600 13px Inter,sans-serif;cursor:pointer;border-top:3px solid transparent}
+.nav button.on{color:var(--ink);border-top-color:var(--or)}
+.score{display:flex;align-items:center;gap:14px}
+.big{font:700 54px/1 "Barlow Condensed",sans-serif}
+.g{color:var(--g)}.o{color:var(--o)}.r{color:var(--r)}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid currentColor}
+.blk{padding:10px 0;border-top:1px solid var(--line)}.blk:first-child{border-top:0}
+.pri{border-left:3px solid var(--or);padding-left:10px}
+del{color:var(--mut)}
+.hero{display:flex;gap:14px;align-items:center;background:var(--ink);color:var(--bg);border-radius:16px;padding:18px}
+.av{width:64px;height:64px;border-radius:50%;background:var(--or);color:#0F1115;display:grid;place-items:center;font:700 32px "Barlow Condensed",sans-serif;flex:none}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 4px;text-align:center}
+.tile b{display:block;font:700 30px/1 "Barlow Condensed",sans-serif}.tile span{font-size:12px;color:var(--mut)}
+.sec{font-weight:600;margin:14px 0 6px}.sec:first-child{margin-top:0}
+.bc{width:150px;height:150px;border-radius:50%;background:var(--or);color:#0F1115;margin:22px auto;display:grid;place-items:center;font:700 24px "Barlow Condensed",sans-serif}
+ol{padding-left:20px;margin:8px 0}li{margin:6px 0}
+@media(prefers-reduced-motion:no-preference){.card{animation:in .25s ease-out}@keyframes in{from{opacity:.4}to{opacity:1}}}
+.lr{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;font:inherit;cursor:pointer}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}.dot.g{background:var(--g)}.dot.o{background:var(--o)}.dot.r{background:var(--r)}.dot.n{background:var(--mut)}
+.sc{font:700 26px/1 "Barlow Condensed","Arial Narrow",sans-serif;margin-left:auto}
+.bt{padding:11px 15px;border:0;border-radius:12px;background:var(--or);color:#0F1115;font:700 15px Inter,sans-serif;cursor:pointer;margin:8px 8px 0 0}.bt.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.code{font:700 34px "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.2em;text-align:center;border:1px dashed var(--or);border-radius:12px;padding:16px;margin:10px 0}
+.warn{border:1px dashed var(--or);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--mut);margin:10px 0}
+.bar2{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:14px}.bar2 i{display:block;height:100%;background:var(--or);transition:width .3s}
+</style></head><body>
+<div id="gate" class="w" hidden></div>
+<div id="ath" hidden><div class="w">
+<div class="top"><svg width="38" height="34" viewBox="0 0 40 36" aria-hidden="true"><line x1="1" y1="16" x2="9" y2="16" stroke="#FF5A1F" stroke-width="2.5" stroke-linecap="round"/><line x1="3" y1="23" x2="10" y2="23" stroke="#FF5A1F" stroke-width="2.5" stroke-linecap="round"/><polyline points="11,32 21,12 31,32" fill="none" stroke="#FF5A1F" stroke-width="5"/><polyline points="17,32 21,24 25,32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="21" cy="4" r="2.5" fill="currentColor"/></svg><span class="brand">APEX SPRINT</span></div>
+<div id="app"></div></div>
+<div class="nav" id="nav" hidden><button data-a="tab" data-v="today">Aujourd’hui</button><button data-a="tab" data-v="plan">Plan</button><button data-a="tab" data-v="soir">Mental</button><button data-a="tab" data-v="coach" hidden>Coach</button><button data-a="tab" data-v="me">Profil</button></div></div>
+<div id="coach" hidden><div class="w"><div id="capp"></div></div><div class="nav" id="cnav"><button data-c="tab" data-v="team">Équipe</button><button data-c="tab" data-v="alerts">Alertes</button><button data-c="tab" data-v="invite">Inviter</button><button data-c="tab" data-v="account">Compte</button></div></div>
+<script>
+let C={a:{}};const ME="__me__";
+const cl=()=>{},cs=()=>{};
+const ent=n=>C.a[n]||(C.a[n]={notes:{obj:"",rec:"",att:"",priv:""},prog:[],sent:false,mode:"off",msgs:[],dec:{},link:false,mental:{},prof:null});
+</script>
+<script>
+const EV=["100 m","200 m","400 m"],AT=["Départ","Vitesse maximale","Endurance de vitesse","Technique","Force","Mobilité"],INJ=["Ischio-jambiers","Mollet / Achille","Genou","Hanche / aine","Dos","Cheville"];
+const PH={prep:"Préparation générale",spec:"Préparation spécifique",comp:"Compétition"},PF={prep:1.15,spec:1,comp:.7},LV={deb:["Débutant",.8],conf:["Confirmé",1],exp:["Expert",1.1]};
+const PD={prep:"Construire la base : force, volume, technique. L’intensité monte progressivement.",spec:"Se rapprocher du rythme de course : vitesse spécifique, qualité maximale.",comp:"Rester frais et rapide : peu de volume, beaucoup de qualité."};
+const CY=["Semaine 1 sur 4 : mise en route","Semaine 2 sur 4 : charge","Semaine 3 sur 4 : charge maximale","Semaine 4 sur 4 : décharge"];
+const INT={high:{prep:"rapide, mais pas à fond",spec:"très rapide, presque à fond",comp:"à fond, peu de répétitions"},med:"moyenne, effort 7 sur 10",low:"facile, effort 3 sur 10"};
+const LP={prep:[.78,5],spec:[.85,3],comp:[.8,3]},LN={sq:"Squat",ht:"Hip thrust",rd:"Soulevé de terre roumain"};
+const FO={prep:"Objectif : construire la force de base",spec:"Objectif : transformer la force en puissance, geste explosif",comp:"Objectif : entretenir la force sans fatigue, geste explosif"};
+const rm1=(p,k)=>{const m=(p.rm||{})[k];if(!m||!+m.w||!+m.r)return 0;return +m.r===1?+m.w:+m.w*(1+ +m.r/30)};
+const lt=(b,p)=>{const r=rm1(p,b.l),pc=LP[p.ph][0]+[-.03,0,.03,-.1][bfac(p).i];return r?` à ${Math.round(r*pc/2.5)*2.5} kg (${Math.round(pc*100)} % de ton max)`:" avec 2 répétitions en réserve"};
+const PRE={"Ischio-jambiers":"Nordiques, 3 x 4","Mollet / Achille":"Montées de talons excentriques, 3 x 12","Genou":"Squat isométrique, 3 x 30 s","Hanche / aine":"Adducteurs au sol, 3 x 30 s","Dos":"Planche latérale, 3 x 30 s","Cheville":"Équilibre unipodal, 3 x 30 s"};
+const WK={"Départ":["Départs de blocs",4,"x 15 m, récup 3 min"],"Vitesse maximale":["Lancés",3,"x 30 m, récup 5 min"],"Endurance de vitesse":["Tempo",4,"x 100 m à 80 %, récup 2 min"],"Technique":["Éducatifs ciblés",3,"x 20 m"],"Force":["Soulevé de terre roumain",3,"x 6 reps","rd"],"Mobilité":["Étirements actifs",1,"12 min"]};
+const force=["Force et gainage","med",[["Squat",4,"x 5 reps","sq"],["Hip thrust",3,"x 8 reps","ht"],["Gainage dynamique",3,"x 40 s"]]];
+const tech=["Technique et mobilité","low",[["Éducatifs de course",4,"x 20 m"],["Footing très lent",1,"10 min"],["Mobilité hanches et chevilles",1,"10 min"]]];
+const plio=["Pliométrie","med",[["Sauts de haies",4,"x 5"],["Bondissements",3,"x 20 m"],["Gainage dynamique",3,"x 40 s"]]];
+const T={"100 m":[["Accélération et départ","high",[["Accélérations départ arrêté",6,"x 30 m, récup 3 min"],["Départs de blocs",4,"x 20 m, récup 4 min"]]],force,tech,["Vitesse maximale","high",[["Lancés",4,"x 30 m + 20 m, récup 5 min"],["Sprints",3,"x 60 m, récup 6 min"]]],plio],
+"200 m":[["Accélération et virage","high",[["Accélérations",5,"x 40 m, récup 3 min"],["Virages lancés",4,"x 80 m, récup 4 min"]]],force,tech,["Vitesse spécifique 200 m","high",[["Répétitions",4,"x 120 m à 95 %, récup 6 min"]]],["Endurance de vitesse","high",[["Répétitions",3,"x 150 m à 90 %, récup 8 min"]]]],
+"400 m":[["Vitesse et départ","high",[["Accélérations",6,"x 30 m, récup 3 min"],["Lancés",3,"x 50 m, récup 5 min"]]],force,["Tempo extensif","low",[["Tempo",6,"x 150 m à 70 %, récup 90 s"],["Mobilité",1,"10 min"]]],["Spécifique 400 m","high",[["Répétitions",3,"x 250 m à 92 %, récup 10 min"]]],["Endurance de vitesse","high",[["Répétitions",2,"x 300 m à 90 %, récup 12 min"]]]]};
+const PICK={3:[0,1,3],4:[0,1,3,4],5:[0,1,2,3,4]},DAYS={3:[1,3,5],4:[1,2,4,5],5:[1,2,3,4,5]},DN=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+const Q=[["sl","Sommeil","mauvais","excellent"],["en","Énergie","vide","pleine"],["mo","Humeur","basse","haute"],["st","Stress","calme","très stressé"],["so","Courbatures","aucune","fortes"]];
+const br=(i,h,o,h2,n)=>({p:[["Inspire",i]].concat(h?[["Retiens",h]]:[],[["Expire",o]],h2?[["Pause",h2]]:[]),n}),Z=(t,w)=>({t,w}),Bz=(t,b)=>({t,b}),pm=c=>[Z(c+" Maintiens.",5),Z("Relâche. Sens la différence.",10)];
+const mins=m=>Math.max(1,Math.round(m.steps.reduce((a,s)=>a+(s.t?s.t.split(" ").length/2.2:0)+(s.b?s.b.n*s.b.p.reduce((x,y)=>x+y[1],0):(s.w||0)),0)/60));
+const M=ev=>{const RV={"100 m":"Le coup de pistolet. Tu pousses fort, le corps incliné. Tu te grandis progressivement vers trente mètres. Entre trente et soixante, tu es haut, rapide, relâché. Sur la fin, tes épaules restent détendues.","200 m":"Le départ, puissant. Tu abordes le virage avec vitesse et fluidité. À la sortie, tu relances et tu te grandis. Dans la ligne droite, tu gardes ta technique, les épaules détendues.","400 m":"Le départ, vite mais contrôlé. Sur les deux cents premiers mètres, tu es fluide, tu économises. Dans le dernier virage, tu gardes ta technique. Dans la ligne droite finale, tu te grandis et tu continues à pousser."}[ev]||"Le départ, puissant. Tu te grandis, tu restes fluide et relâché jusqu’à la ligne.";
+return[
+{n:"Scan corporel et sommeil",c:"Récupérer et dormir",goal:"Relâcher le corps et préparer une bonne nuit.",why:"Relâcher chaque zone l’une après l’autre aide le corps à passer en mode récupération.",steps:[Z("Allonge-toi, lumières éteintes. Mets ton téléphone en silencieux. Ferme les yeux.",6),Bz("Inspire par le nez, souffle doucement par la bouche, plus longtemps.",br(4,0,6,0,6)),Z("Je nomme une zone de ton corps. Tu la sens, et tu la relâches en soufflant.",4),Z("Tes pieds. Les orteils, la voûte, les talons. Relâche.",10),Z("Tes mollets. Relâche.",10),Z("Tes cuisses. Relâche.",10),Z("Tes fessiers et le bas du dos. Relâche.",10),Z("Ton ventre. Relâche.",10),Z("Ta poitrine et ton dos. Relâche.",10),Z("Tes mains, tes avant-bras, tes épaules. Relâche.",10),Z("Ton visage : le front, la mâchoire, la langue. Relâche.",10),Z("Ton corps est lourd et chaud. Pense à une chose que tu as bien faite cette semaine.",20),Z("Garde cette image. Laisse venir le sommeil. Bonne nuit.",5)]},
+{n:"Cohérence cardiaque",c:"Me calmer",goal:"Faire baisser le stress en ralentissant ta respiration.",why:"Respirer lentement, à un rythme régulier, aide le corps à se calmer.",steps:[Z("Assieds-toi, le dos droit, les pieds au sol. Pendant cinq minutes, tu suis le cercle. Il grandit, tu inspires. Il rétrécit, tu expires.",4),Bz("Suis le cercle.",br(5,0,5,0,30)),Z("Reviens doucement. Bouge tes doigts, tes pieds.",3)]},
+{n:"Visualiser ma course",c:"Visualiser",goal:"Répéter ta course dans ta tête : gestes, rythme, confiance.",why:"Répéter mentalement une course, avec tous les sens, prépare le corps et le cerveau.",steps:[Bz("Installe-toi. Cinq respirations lentes.",br(4,0,6,0,5)),Z("Ferme les yeux. Vois-toi arriver sur la piste. Entends les bruits autour de toi. Sens le tartan sous tes pointes.",10),Z("Tu t’approches de la ligne. Tu es calme et prêt. Tu connais ta course.",8),Z("On la joue d’abord au ralenti, depuis tes yeux.",3),Z(RV,24),Z("Maintenant, rejoue-la à vitesse réelle. Sens chaque appui dans tes jambes, ton souffle, ton rythme.",30),Z("Tu franchis la ligne, fort et relâché. Garde cette sensation dans ton corps.",12),Z("Reviens ici. Ouvre les yeux.",3)]},
+{n:"Relaxation musculaire",c:"Récupérer et dormir",goal:"Relâcher les tensions inutiles, clé de la vitesse.",why:"Contracter puis relâcher chaque muscle t’apprend à sentir la différence et à te détendre.",steps:[Z("Allonge-toi. On va contracter une zone, puis la relâcher, l’une après l’autre.",5)].concat(pm("Serre les orteils."),pm("Pointe les pieds vers toi."),pm("Serre les genoux."),pm("Serre les fessiers."),pm("Rentre le ventre."),pm("Ferme les poings."),pm("Monte les épaules vers les oreilles."),pm("Plisse tout le visage."),[Bz("Termine avec cinq respirations lentes.",br(4,0,6,0,5))])},
+{n:"Gérer le stress de compétition",c:"Me calmer",goal:"Garder ton calme à l’appel et sur les blocs.",why:"Un souffle lent, une phrase d’ancrage et une routine simple t’aident à rester maître de toi.",steps:[Bz("Assieds-toi. Trois minutes pour ralentir ton cœur.",br(4,0,6,0,18)),Z("Choisis ta phrase d’ancrage. Par exemple : je suis prêt, je suis fort. Dis-la dans ta tête.",8),Z("Répète-la cinq fois, en soufflant.",25),Z("Imagine la chambre d’appel. Les autres athlètes. Le bruit. Ton cœur qui accélère. C’est normal : ton corps se prépare.",12),Z("Respire. Dis ta phrase. Regarde le stress baisser, comme une vague qui se retire.",20),Z("Ta routine de départ, en trois gestes. Un : tu respires. Deux : tu dis ta phrase. Trois : tu regardes devant toi, vers la piste.",8),Z("Fais-la maintenant, doucement.",20)]},
+{n:"Mots-clés et focus",c:"Me concentrer",goal:"Rester concentré sur deux consignes pendant l’effort.",why:"Deux mots simples gardent ton attention sur l’essentiel quand la fatigue arrive.",steps:[Z("Choisis deux mots pour ta course. Par exemple : grand, et relâché. Ce sont tes deux clés.",10),Bz("Ferme les yeux. Dis-les dans ta tête : le premier en inspirant, le second en expirant.",br(4,0,4,0,15)),Z("Visualise dix secondes de course en ne pensant qu’à ces deux mots.",15),Z("Si une autre pensée arrive, dis simplement : suivant. Et reviens à tes mots.",10)]},
+{n:"Bilan et confiance",c:"Prendre confiance",goal:"Construire ta confiance en reconnaissant tes progrès.",why:"Noter ce que tu réussis nourrit ta confiance avec des faits.",steps:[Z("Prends un papier ou ton téléphone. Note trois choses que tu as bien faites cette semaine. Petites ou grandes.",40),Z("Note maintenant un seul point à améliorer, formulé comme un objectif simple : la semaine prochaine, je veux…",30),Z("Relis tes trois réussites à voix haute.",20),Bz("Termine avec cinq respirations lentes.",br(4,0,6,0,5))]},
+{n:"Soupir physiologique",c:"Me calmer",goal:"Te calmer vite, en deux minutes.",why:"Une double inspiration suivie d’un long souffle calme rapidement beaucoup de gens.",steps:[Z("Pour te calmer vite. Inspire par le nez, puis une deuxième petite inspiration, et souffle longuement par la bouche.",6),Bz("Suis le rythme.",{p:[["Inspire",2],["Inspire encore",1],["Expire",6]],n:12}),Z("Reviens à une respiration normale. Comment te sens-tu ?",4)]},
+{n:"Respiration carrée",c:"Me concentrer",goal:"Te concentrer et te stabiliser avant un effort.",why:"Un rythme régulier occupe ton attention et calme les pensées qui s’agitent.",steps:[Z("Pour te concentrer. Inspire quatre secondes, retiens quatre, souffle quatre, pause quatre.",6),Bz("Suis le cercle.",br(4,4,4,4,10)),Z("Garde ce calme concentré.",3)]},
+{n:"Reset après une erreur",c:"Me concentrer",goal:"Repartir à zéro après un mauvais départ ou une erreur.",why:"Une routine courte coupe la rumination et ramène ton attention sur la prochaine action.",steps:[Z("Tu as raté ton départ, ou ta course n’est pas celle que tu voulais. C’est fini. On remet à zéro.",6),Z("Étape un. Stop. Dis-toi : stop.",4),Bz("Étape deux. Une respiration longue : inspire, souffle plus long.",br(3,0,6,0,3)),Z("Étape trois. Dis ton mot-clé dans ta tête. Par exemple : relâché.",6),Z("Étape quatre. Regarde devant toi. Ta seule tâche : la prochaine action.",6)]},
+{n:"Dossier de preuves",c:"Prendre confiance",goal:"Te rappeler tes réussites pour croire en toi.",why:"Se rappeler des réussites précises donne des preuves concrètes à ta confiance.",steps:[Z("Pour ta confiance. Rappelle-toi une course ou une séance où tu t’es senti fort.",8),Z("Vois la scène. Où es-tu ? Qui est là ? Que vois-tu ?",15),Z("Sens ton corps à ce moment. Tes jambes, ton souffle, ta confiance.",15),Z("Qu’as-tu fait pour y arriver ? L’entraînement, la préparation, ton courage. Dis-le.",20),Z("Maintenant, une deuxième réussite. Même chose.",30),Z("Dis-toi : j’ai déjà réussi. Je sais le faire.",10),Bz("Termine avec trois respirations lentes.",br(4,0,6,0,3))]},
+{n:"Transformer le stress en énergie",c:"Prendre confiance",goal:"Voir ton stress comme de l’énergie pour la course.",why:"Voir l’excitation plutôt qu’une menace aide beaucoup d’athlètes à mieux performer sous pression.",steps:[Z("Ton cœur bat vite avant la course. Ton corps se prépare à donner le maximum.",6),Z("Au lieu de dire : je suis stressé, dis-toi : je suis excité. Dis-le dans ta tête, puis à voix basse.",15),Bz("Respire, et laisse cette énergie monter sans la combattre.",br(4,0,4,0,6)),Z("Pose la main sur ta poitrine. Sens ton cœur. C’est ta force qui se prépare.",12),Z("Redis : je suis excité, je suis prêt.",8)]},
+{n:"Dialogue interne",c:"Prendre confiance",goal:"Remplacer les pensées qui te freinent par des consignes utiles.",why:"Ce que tu te dis influence ta confiance et ton geste.",steps:[Z("Ce que tu te dis avant et pendant la course compte. On va l’entraîner.",5),Z("Pense à une phrase négative que tu te dis parfois. Par exemple : je vais rater mon départ.",15),Z("Dis-toi : c’est une pensée, pas un fait.",6),Z("Remplace-la par une consigne utile. Par exemple : je pousse fort, je me grandis.",15),Z("Redis ta nouvelle phrase trois fois, en soufflant.",20),Z("Choisis une phrase courte à répéter le jour de la course.",15)]},
+{n:"Routine de départ",c:"Visualiser",goal:"Préparer une routine calme et un plan si ça se passe mal.",why:"Une routine fixe et des plans « si… alors… » évitent d’improviser sous stress.",steps:[Z("Une bonne routine de départ te garde calme quoi qu’il arrive.",5),Z("Étape un : une respiration lente. Fais-la.",8),Z("Étape deux : ta phrase d’ancrage, dans ta tête.",8),Z("Étape trois : ton regard devant toi, vers la piste.",8),Z("Rejoue la routine en entier, comme sur la ligne de départ.",20),Z("Maintenant, prépare un plan. Si le stress monte, alors je fais ma respiration lente. Dis-le.",12),Z("Si je fais un mauvais départ, alors je dis stop, et je me concentre sur ma prochaine poussée. Dis-le.",15),Z("Rejoue encore une fois la routine, calmement.",20)]},
+{n:"Vider sa tête avant de dormir",c:"Récupérer et dormir",goal:"Poser tes soucis pour mieux dormir.",why:"Écrire ce qui tourne dans ta tête aide à l’en détacher avant la nuit.",steps:[Z("Prends un papier. Pendant une minute, note tout ce qui tourne dans ta tête.",60),Z("Pour chaque pensée, écris une petite action pour demain. Pas ce soir.",45),Z("Pose le papier loin de ton lit. Tout est noté. Tu n’as plus à y penser.",8),Bz("Inspire doucement, souffle longuement.",br(4,0,6,0,8)),Z("Laisse venir le sommeil. Bonne nuit.",5)]},
+{n:"Activation avant course",c:"Activation",goal:"Te réveiller et monter en énergie avant de courir.",why:"Un peu de mouvement, un souffle dynamique et des mots forts montent l’énergie sans te déconcentrer.",steps:[Z("Pour te réveiller avant une course. Si tu as des vertiges, reviens à une respiration normale.",6),Z("Debout. Secoue les bras et les jambes pendant vingt secondes.",20),Bz("Inspire par le nez, souffle par la bouche, de façon dynamique.",br(2,0,2,0,10)),Z("Dis tes deux mots-clés à voix haute, avec force.",10),Bz("Pour finir, trois respirations calmes. Inspire, souffle plus long.",br(4,0,6,0,3)),Z("Tu es éveillé et prêt.",3)]}
+].map(m=>({...m,min:mins(m)}))};
+const NEED={"Accélération et départ":[["chrono","chronomètre chaque accélération de 30 m"],["video","filme de profil le départ et les 10 premiers mètres, sur la 1re et la dernière accélération"]],"Force et gainage":[["note","note les charges utilisées et la difficulté de la dernière série"]],"Vitesse maximale":[["chrono","chronomètre chaque lancé sur les 30 m rapides"],["video","filme de profil la zone de vitesse maximale, sur le 1er et le dernier lancé"]],"Accélération et virage":[["chrono","chronomètre chaque accélération et chaque virage lancé"],["video","filme de profil l’entrée et la sortie du virage, sur la 1re et la dernière répétition"]],"Vitesse spécifique 200 m":[["chrono","chronomètre chaque 120 m"],["video","filme de profil les 30 derniers mètres, sur la 1re et la dernière répétition"]],"Endurance de vitesse":[["chrono","chronomètre chaque répétition"],["video","filme de profil les 50 derniers mètres de la 1re répétition et de la dernière"]],"Vitesse et départ":[["chrono","chronomètre chaque accélération et chaque lancé"],["video","filme de profil le départ et les 10 premiers mètres"]],"Tempo extensif":[["chrono","chronomètre chaque 150 m"]],"Spécifique 400 m":[["chrono","chronomètre chaque 250 m"],["video","filme de profil les 50 derniers mètres de la 1re répétition, et les 50 m avant les 50 derniers de la dernière"]]};
+const nd=s=>(NEED[s.name]||[]).filter(x=>x[0]!=="video"),NL={chrono:"Chronos",note:"Notes"};
+function needs(s){const n=nd(s);return`<div class="card" style="margin:12px 0 0;background:var(--bg)"><b>À prévoir pendant cette séance</b>`+(n.length?n.map(x=>`<div class="blk">${NL[x[0]]} : <span class="mut">${x[1]}</span></div>`).join("")+`<p class="mut" style="margin:8px 0 0">${n.some(x=>x[0]==="video")?"Filme de profil, caméra fixe, l’athlète entier dans l’image. C’est ce qui permettra d’analyser ta technique en détail. ":""}Tu valideras tout après la séance.</p>`:`<p class="mut" style="margin:6px 0 0">Rien à préparer. À la fin, tu réponds à 5 questions.</p>`)+`</div>`}
+const SX=[["d","La séance était",["Facile","Comme prévu","Très dure"]],["j","Tes jambes",["Légères","Normales","Lourdes"]],["v","Ta vitesse à la fin",["Je l’ai gardée","J’ai ralenti"]],["t","Ta course était",["Fluide","Crispée","Sans puissance"]],["g","Douleur ?",["Aucune","Légère","Forte"]]],ZN=["Ischio-jambiers","Mollet / Achille","Genou","Hanche / aine","Dos","Cheville","Autre"];
+const segs2=(k,arr)=>`<div class="row" style="margin-top:6px">${arr.map(o=>`<button type="button" class="seg ${B.s[k]===o?"on":""}" data-a="bs" data-k="${k}" data-v="${o}">${o}</button>`).join("")}</div>`;
+function bilH(){const pl=BP.length?`<div class="sec">Ce qui était prévu</div><button class="btn alt" data-a="allok" style="margin:0 0 8px">Tout fait comme prévu</button>`+BP.map((t,i)=>`<div class="q"><div>${esc(t)}</div><div class="row" style="margin-top:6px">${[[2,"Fait"],[1,"En partie"],[0,"Pas fait"]].map(([v,l])=>`<button type="button" class="seg ${B.pl[i]===v?"on":""}" data-a="pl" data-i="${i}" data-v="${v}">${l}</button>`).join("")}</div><input type="text" data-b="pa" data-i="${i}" placeholder="Ce que tu as fait (facultatif)" value="${esc(B.pa[i]||"")}"></div>`).join(""):"";
+return pl+`<div class="sec" style="margin-top:16px">Ton ressenti</div>`+SX.map(q=>`<div class="q"><div><b>${q[1]}</b></div>${segs2(q[0],q[2])}</div>`).join("")+(B.s.g&&B.s.g!=="Aucune"?`<div class="q"><div><b>Où ?</b></div>${segs2("z",ZN)}</div>`:"")+`<div class="err" id="berr"></div><button class="btn" data-a="bsave">Enregistrer</button>`}
+const rb=()=>{const y=scrollY;$("#bil").innerHTML=bilH();scrollTo(0,y)};
+function summ(L){const pr=!S.p.coach&&L.prop&&L.prop.length;return`<div class="card"><b class="g">Séance enregistrée.</b>${S.p.coach?`<p class="mut" style="margin:6px 0 0">Bilan envoyé à ton coach.</p>`:""}</div>`+(pr?`<div class="card"><h2 style="margin-top:0">Pour ta prochaine séance</h2>${L.prop.map(x=>`<p style="margin:6px 0">${esc(x.t)}</p>`).join("")}</div>`:"")}
+function bsave(){const er=$("#berr"),s=B.s;
+if(BP.some((x,i)=>B.pl[i]===undefined)){er.textContent="Indique ce qui a été fait, ou appuie sur « Tout fait comme prévu ».";return}
+if(!s.d||!s.j||!s.v||!s.t||!s.g){er.textContent="Réponds à toutes les questions de ressenti.";return}
+if(s.g!=="Aucune"&&!s.z){er.textContent="Indique où tu as mal.";return}
+const ex={high:8,med:7,low:3}[BI],rpe=Math.max(1,Math.min(10,ex+({"Facile":-2,"Comme prévu":0,"Très dure":2}[s.d]))),prop=[],add=[],miss=BP.filter((x,i)=>B.pl[i]<2).length;let adj=1;
+const ad=(t,n,u,txt)=>{if(!add.some(x=>x.t===t)){add.push({t,n,u});prop.push({t:txt})}};
+if(s.g==="Forte"){adj=.7;prop.push({t:"Douleur forte : repose-toi et consulte un médecin ou un kiné du sport avant de reprendre."})}
+else{
+if(s.d==="Très dure"){adj=.85;prop.push({t:"Ta prochaine séance sera un peu plus légère."})}
+else if(s.d==="Facile"&&!miss){adj=1.05;prop.push({t:"Ta prochaine séance sera un peu plus chargée."})}
+if(miss)prop.push({t:"Tu n’as pas tout fait ("+miss+" exercice"+(miss>1?"s":"")+") : on garde le même volume pour la prochaine séance."});
+if(s.g==="Légère"){adj=Math.min(adj,.9);ad("Mobilité",1,"10 min","Petite gêne : on ajoute 10 minutes de mobilité. Si elle revient, vois un kiné.")}
+if(s.j==="Lourdes"){adj=Math.min(adj,.9);prop.push({t:"Jambes lourdes : prends une journée tranquille, marche, étire-toi et couche-toi tôt."})}
+if(s.v==="J’ai ralenti")ad("Tempo",3,"x 100 m à 80 %, récup 2 min","Tu as ralenti à la fin : on ajoute 3 x 100 m à allure modérée pour tenir plus longtemps.");
+if(s.t==="Crispée")ad("Éducatifs de relâchement",3,"x 20 m","Course crispée : on ajoute 3 x 20 m d’éducatifs pour te relâcher. Ce soir, fais l’exercice mental « Mots-clés et focus ».");
+if(s.t==="Sans puissance")ad("Bondissements",3,"x 20 m","Course sans puissance : on ajoute 3 x 20 m de bondissements pour travailler la poussée.")}
+if(!prop.length)prop.push({t:"Tout va bien : on continue comme prévu."});
+S.ck[dk()].log={rpe,n:{},t:B.t,s:B.s,done:BP.map((t,i)=>({t,s:B.pl[i],a:B.pa[i]||""})),prop,tool:prop.map(x=>x.t),msg:S.p.coach?["Bilan envoyé à ton coach."]:prop.map(x=>x.t)};
+S.adj={f:adj,d:dk()};S.extra=S.p.coach||s.g==="Forte"?[]:add.slice(0,3);B=null;save();render()}
+
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const dk=()=>new Date().toLocaleDateString("sv");
+let S={p:null,ck:{},me:{}};
+const save=()=>dbSave();
+const D0=()=>({name:"",age:"",h:"",w:"",ev:"100 m",spw:4,ph:"spec",lv:"conf",st:[],wk:[],inj:[],stO:"",wkO:"",injO:"",rm:{sq:{w:"",r:""},ht:{w:"",r:""},rd:{w:"",r:""}}});
+let D=D0(),tab="today",sel=-1,draft={sl:3,en:3,mo:3,st:3,so:3,pain:"aucune"},redo=false,editing=false,bt=null,B=null,BN=[],BI="high",BP=[];
+function build(p){const ss=PICK[p.spw].map((k,i)=>{const t=T[p.ev][k];return{name:t[0],int:t[1],day:DAYS[p.spw][i],blocks:t[2].map(b=>({t:b[0],n:b[1],u:b[3]?`x ${LP[p.ph][1]} reps`:b[2],l:b[3]}))}});
+p.wk.filter(w=>WK[w]).forEach((w,i)=>{const b=WK[w];ss[i%ss.length].blocks.push({t:b[0],n:b[1],u:b[3]?`x ${LP[p.ph][1]} reps`:b[2],l:b[3],pri:w})});return ss}
+function bfac(p){const i=Math.max(0,Math.floor((new Date(dk())-new Date(p.start))/6048e5))%4;return{f:[.9,1,1.1,.6][i]*PF[p.ph]*LV[p.lv][1],lab:CY[i],i}}
+const fmt=(n,u)=>n>1?n+" "+u:u,sc=(n,f)=>n<=1?n:Math.max(1,Math.round(n*f));
+function sess(s,bf,f,p,pre){const it=s.int==="high"?INT.high[p.ph]:INT[s.int];
+const body=s.blocks.map(b=>{const a=sc(b.n,bf),z=sc(b.n,bf*f);return`<div class="blk ${b.pri?"pri":""}"><b>${esc(b.t)}</b>${b.pri?` <span class="tag">Priorité : ${esc(b.pri)}</span>`:""}<br>${z<a?`<del>${fmt(a,b.u)}</del> `:""}${fmt(z,b.u)}${b.l?lt(b,p):""}</div>`}).join("");
+return`<p class="mut">${s.blocks.some(b=>b.l)?FO[p.ph]+". ":""}Intensité : ${it}.</p>`+body+`<details style="margin-top:10px"><summary>Échauffement et retour au calme</summary><div class="blk mut"><b>Échauffement, 20 min</b><br>5 min de footing, mobilité, éducatifs, 2 ou 3 accélérations progressives.</div>${pre.map(x=>`<div class="blk mut">Prévention : ${esc(x)}</div>`).join("")}<div class="blk mut"><b>Retour au calme</b><br>5 à 10 min de trot lent, puis étirements légers.</div></details>`+needs(s)}
+function decide(v){const a=[v.sl,v.en,v.mo,6-v.st,6-v.so],nm=["sommeil","énergie","humeur","stress élevé","courbatures"];const score=Math.round(a.reduce((x,y)=>x+y,0)/5*20);
+let lv=v.pain==="vive"?"r":score>=70?"g":score>=50?"o":"r";if(v.pain==="légère"&&lv==="g")lv="o";
+const low=nm.filter((n,i)=>a[i]<=2);return{score,lv,why:low.length?"Points faibles du jour : "+low.join(" et ")+".":"Tous tes indicateurs sont bons."}}
+function head(){const r=$("#nav"),ct=r.querySelector('[data-v="coach"]');if(ct)ct.hidden=!(S.p&&S.p.coach);r.hidden=!S.p||editing;r.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===tab))}
+const chips=(g,arr,cls)=>[...arr,"Autre"].map(x=>`<button type="button" class="chip ${cls||""}" data-a="chip" data-g="${g}" data-v="${esc(x)}">${esc(x)}</button>`).join("");
+const oth=(g,ph)=>`<div id="o_${g}" hidden><input type="text" data-f="${g}O" placeholder="${ph}" value="${esc(D[g+"O"])}"></div>`;
+const segs=(g,arr)=>`<div class="row">${arr.map(x=>`<button type="button" class="seg" data-a="seg" data-g="${g}" data-v="${x[0]}">${x[1]}</button>`).join("")}</div>`;
+function onboard(){$("#app").innerHTML=`<h1>${editing?"Modifier mon profil":"Ton plan de sprint, ajusté chaque jour."}</h1><p class="mut">Plus tes réponses sont précises, plus ton plan est efficace.</p>
+<div class="card"><label class="f" style="margin-top:0">Prénom</label><input type="text" data-f="name" value="${esc(D.name)}" autocomplete="given-name" style="margin-top:0">
+<div class="row"><div style="flex:1"><label class="f">Âge</label><input type="number" inputmode="numeric" data-f="age" value="${esc(D.age)}" style="margin-top:0"></div><div style="flex:1"><label class="f">Taille (cm)</label><input type="number" inputmode="numeric" data-f="h" value="${esc(D.h)}" style="margin-top:0"></div><div style="flex:1"><label class="f">Poids (kg)</label><input type="number" inputmode="numeric" data-f="w" value="${esc(D.w)}" style="margin-top:0"></div></div>
+<label class="f">Ton épreuve</label>${segs("ev",EV.map(x=>[x,x]))}
+<label class="f">Ton niveau</label>${segs("lv",[["deb","Débutant"],["conf","Confirmé"],["exp","Expert"]])}
+<label class="f">Où en es-tu dans ta saison ?</label>${segs("ph",[["prep","Préparation"],["spec","Spécifique"],["comp","Compétition"]])}
+<label class="f">Séances par semaine</label>${segs("spw",[[3,"3"],[4,"4"],[5,"5"]])}</div>
+<div class="card"><div class="sec">Tes points forts</div><div class="row">${chips("st",AT,"sw")}</div>${oth("st","Précise ton point fort")}
+<div class="sec">Tes points faibles</div><div class="row">${chips("wk",AT)}</div>${oth("wk","Précise ton point faible")}
+<p class="mut">Un même point ne peut pas être à la fois fort et faible.</p></div>
+<div class="card"><div class="sec">Ta force en musculation</div><p class="mut" style="margin:0 0 8px">Pour régler tes charges. Entre la charge la plus lourde que tu as soulevée avec une bonne technique, et le nombre de répétitions (1 à 10). Si c’est ton max sur une répétition, mets 1. Laisse vide si tu ne fais pas l’exercice.</p>${Object.keys(LN).map(k=>`<div class="sec">${LN[k]}</div><div class="row"><input type="number" inputmode="decimal" data-m="${k}.w" placeholder="Charge (kg)" value="${esc(D.rm[k].w)}" style="flex:1;margin-top:0"><input type="number" inputmode="numeric" data-m="${k}.r" placeholder="Répétitions" value="${esc(D.rm[k].r)}" style="flex:1;margin-top:0"></div>`).join("")}</div>
+<div class="card"><div class="sec">Blessures passées ou gênes actuelles</div><div class="row">${chips("inj",INJ)}</div>${oth("inj","Précise la blessure ou la gêne")}<p class="mut">Laisse vide si aucune.</p></div>
+<div class="err" id="err"></div><button class="btn" data-a="start">${editing?"Enregistrer":"Créer mon plan"}</button>
+${editing?`<button class="btn alt" data-a="cancel">Annuler</button>`:""}
+<p class="mut">Apex Sprint est une aide à l’entraînement. Il ne remplace ni un médecin ni un entraîneur.</p>`;sync()}
+function sync(){document.querySelectorAll("[data-g]").forEach(b=>{const g=b.dataset.g,v=b.dataset.v;b.classList.toggle("on",Array.isArray(D[g])?D[g].includes(v):String(D[g])===v)});["st","wk","inj"].forEach(g=>{const o=$("#o_"+g);if(o)o.hidden=!D[g].includes("Autre")})}
+function checkin(){return`<div class="card"><h2 style="margin-top:0">Comment te sens-tu ce matin ?</h2>${Q.map(q=>`<div class="q"><div class="qh"><span>${q[1]}</span><span id="v_${q[0]}">${draft[q[0]]}/5</span></div><input type="range" min="1" max="5" value="${draft[q[0]]}" data-r="${q[0]}"><div class="ql"><span>${q[2]}</span><span>${q[3]}</span></div></div>`).join("")}
+<label class="f">Douleur ou gêne aujourd’hui ?</label><div class="row">${["aucune","légère","vive"].map(x=>`<button type="button" class="seg ${draft.pain===x?"on":""}" data-a="pain" data-v="${x}">${x[0].toUpperCase()+x.slice(1)}</button>`).join("")}</div>
+<button class="btn" data-a="run">Voir ma séance du jour</button></div>`}
+function today(){if(S.p.coach)return todayC();const p=S.p,ss=build(p),k=dk(),c=S.ck[k],wd=new Date().getDay(),b=bfac(p),pre=p.inj.filter(x=>PRE[x]).map(x=>PRE[x]);
+const i=sel>=0?sel:ss.findIndex(s=>s.day===wd);const opts=`<option value="-1">Séance d’aujourd’hui (${DN[wd]})</option>`+ss.map((s,j)=>`<option value="${j}" ${sel===j?"selected":""}>${DN[s.day]} : ${esc(s.name)}</option>`).join("");
+let h=`<h1>Bonjour ${esc(p.name)}.</h1><p class="mut">${DN[wd]}, ${p.ev}. ${b.lab}.</p><label class="f">Voir une autre séance (test)</label><select data-a="sel" style="margin-top:0">${opts}</select>`;
+if(!c||redo)return h+checkin();
+const d=decide(c.v),lab={g:"En forme",o:"Un peu fatigué",r:"Récupération nécessaire"}[d.lv];
+h+=`<div class="card"><div class="score"><div class="big ${d.lv}">${d.score}</div><div><span class="tag ${d.lv}">${lab}</span><div class="mut" style="margin-top:6px">${d.why}</div></div></div></div>`;
+const re=`<button class="btn alt" data-a="redo">Refaire le check-in</button>`;
+if(c.v.pain==="vive")return h+`<div class="card"><h2 style="margin-top:0">Repos aujourd’hui</h2><p>Tu signales une douleur vive. Ne fais pas de séance. Si elle dure ou revient, consulte un médecin ou un kiné du sport.</p></div>`+re;
+if(i<0)return h+`<div class="card"><h2 style="margin-top:0">Jour de repos</h2><p>Pas de séance prévue. Mange bien, dors bien. Tu peux tester une séance avec le menu ci-dessus.</p></div>`+re;
+let s=ss[i],f={g:1,o:.75,r:.5}[d.lv],bf=b.f,note="";
+if(d.lv==="g")note="Séance maintenue comme prévu. Bonne séance.";
+else if(d.lv==="o")note="Volume réduit de 25 %. Garde une vitesse nette, arrête une répétition si la qualité baisse.";
+else if(s.int!=="low"){s={name:"Récupération active",int:"low",blocks:[{t:"Footing très lent",n:1,u:"15 min"},{t:"Mobilité hanches et chevilles",n:1,u:"10 min"},{t:"Gainage",n:3,u:"x 30 s"}]};f=1;bf=1;note="Séance intense remplacée par de la récupération active. Ton corps te dit de ralentir."}
+else note="Volume réduit de 50 %. Écoute ton corps.";
+const ad=S.adj&&S.adj.d!==k&&(new Date(k)-new Date(S.adj.d))/864e5<=3?S.adj.f:1;
+if(ad!==1&&s.name!=="Récupération active"){f*=ad;if(d.lv==="g")note=ad<1?"Volume réduit de "+Math.round((1-ad)*100)+" % d’après ta dernière séance.":"Volume augmenté de 5 % : ta dernière séance était facile.";else if(ad<1)note+=" Encore réduit d’après ta dernière séance."}
+if(c.keep){s=ss[i];f=1;bf=b.f}
+if(S.extra&&S.extra.length&&s.name!=="Récupération active"&&!c.log)s={...s,blocks:s.blocks.concat(S.extra.map(x=>({t:x.t,n:x.n,u:x.u,pri:"Suite de ta dernière séance"})))};
+h+=`<div class="card"><b style="font-size:18px">${esc(s.name)}</b><p class="mut">${c.keep?"Plan initial conservé.":note}</p>${sess(s,bf,f,p,pre)}</div>`;
+BN=[];BI=s.int;BP=s.blocks.map(b=>b.t+" : "+fmt(sc(b.n,bf*f),b.u)+(b.l?lt(b,p):""));if(c.ok&&!c.log)B=B||{rpe:5,n:{},t:{},s:{},pl:{},pa:{}};
+h+=c.log?summ(c.log)+re:c.ok?`<div class="card"><h2 style="margin-top:0">Bilan de séance</h2><div id="bil">${bilH()}</div></div>`:`<button class="btn" data-a="ok">Valider la séance</button>${!c.keep&&d.lv!=="g"?`<button class="btn alt" data-a="keep">Garder mon plan initial</button>`:""}`+re;
+const m=M(p.ev)[wd];return h+`<div class="card"><b>Ce soir : ${m.n}</b><p class="mut">${m.min} min pour entraîner ton mental et gérer ton stress.</p><button class="btn alt" data-a="tab" data-v="soir" style="margin-top:6px">Voir l’exercice</button></div>`}
+let path=null;
+const ccard=(x,n,f)=>`<div class="card"><span class="tag">Programme de ton coach</span><p style="margin:8px 0 0;font-size:18px"><b>${esc(x.t)}</b></p><p class="mut" style="margin:4px 0">${n}</p><div style="white-space:pre-line;margin:8px 0">${esc(x.x)}</div>${f!==1?`<p><b>Volume conseillé aujourd’hui : ${Math.round(f*100)} %</b></p>`:""}</div>`;
+const chat=(E,w)=>`<div id="chat">${E.msgs.length?E.msgs.map(m=>`<div style="display:flex;justify-content:${m.f===w?"flex-end":"flex-start"};margin:6px 0"><div style="max-width:80%;padding:8px 12px;border-radius:14px;${m.f===w?"background:var(--or);color:#0F1115":"background:var(--card);border:1px solid var(--line)"}">${esc(m.x)}<div style="font-size:11px;opacity:.7">${new Date(m.t).toLocaleString("fr-FR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div></div></div>`).join(""):`<p class="mut">Aucun message pour l’instant.</p>`}</div>`;
+const exCard=(m,done)=>`<div class="card"><b style="font-size:18px">${m.n}</b><p class="mut">${m.goal}</p><ol>${m.s.map(x=>`<li>${x}</li>`).join("")}</ol>${m.b?`<div class="bc" id="bc">Prêt</div><p class="mut" style="text-align:center" id="btm">${m.b[2]} s</p><button class="btn alt" data-a="breath" data-v="${m.b.join(",")}">Lancer la respiration guidée</button>`:""}<button class="btn alt" data-a="play" data-n="${esc(m.n)}">Écouter la séance guidée</button>${done?`<p class="g"><b>Exercice terminé ce soir.</b></p>`:`<button class="btn" data-a="mdone">Marquer comme fait</button>`}</div>`;
+function cprog(){const E=ent(ME);if(!E.sent||!E.prog.length)return"";return E.prog.slice().sort((a,b)=>((+a.d+6)%7)-((+b.d+6)%7)).map(x=>`<div class="card"><b>${DN[x.d]}</b> <span class="mut">: ${esc(x.t)}</span><div style="white-space:pre-line;margin-top:8px">${esc(x.x)}</div></div>`).join("")}
+function gate(){$("#app").innerHTML=`<h1>Bienvenue sur Apex Sprint.</h1><p class="mut">Comment t’entraînes-tu ?</p><div class="card"><b>Je n’ai pas de coach</b><p class="mut">L’outil crée ton programme, l’ajuste chaque jour et analyse ta technique.</p><button class="btn" data-a="path" data-v="tool">Continuer sans coach</button></div><div class="card"><b>J’ai un coach</b><p class="mut">Tu saisis son code. Ton coach t’envoie ton programme, tes exercices mentaux et ses consignes.</p><button class="btn alt" data-a="path" data-v="coach">Saisir le code de mon coach</button></div>`}
+function onboardC(){$("#app").innerHTML=`<h1>Rejoins ton coach</h1><div class="card"><label class="f" style="margin-top:0">Code de ton coach</label><input type="text" id="lk" placeholder="Code reçu de ton coach" style="margin-top:0" autocapitalize="characters"><div class="err" id="lke"></div><button class="btn" data-a="joinc">Rejoindre mon coach</button><button class="btn alt" data-a="path" data-v="">Retour</button></div>`}
+function todayC(){cl();const p=S.p,E=ent(ME),k=dk(),c=S.ck[k],tw=new Date().getDay(),wd=sel>=0?sel:tw;
+let h=`<h1>Bonjour ${esc(p.name)}.</h1><p class="mut">${DN[wd]}. Ton programme vient de ton coach.</p><label class="f">Jour à tester</label><select data-a="sel" style="margin-top:0"><option value="-1">Aujourd’hui (${DN[tw]})</option>${DN.map((d,j)=>`<option value="${j}" ${sel===j?"selected":""}>${d}</option>`).join("")}</select>`;
+if(!c||redo)return h+checkin();
+const d=decide(c.v),lab={g:"En forme",o:"Un peu fatigué",r:"Récupération nécessaire"}[d.lv],re=`<button class="btn alt" data-a="redo">Refaire le check-in</button>`;
+h+=`<div class="card"><div class="score"><div class="big ${d.lv}">${d.score}</div><div><span class="tag ${d.lv}">${lab}</span><div class="mut" style="margin-top:6px">Ton coach voit cet état du matin.</div></div></div></div>`;
+if(c.v.pain==="vive")return h+`<div class="card"><h2 style="margin-top:0">Repos aujourd’hui</h2><p>Tu signales une douleur vive. Ne fais pas de séance et préviens ton coach. Si elle dure ou revient, consulte un médecin ou un kiné du sport.</p></div>`+re;
+const dd=E.dec[k];if(dd===0)return h+`<div class="card"><h2 style="margin-top:0">Repos conseillé par ton coach</h2><p>Pas de séance aujourd’hui.</p></div>`+re;
+const cp=E.sent?E.prog.find(x=>+x.d===wd):null;
+if(!cp)return h+`<div class="card"><h2 style="margin-top:0">Pas de séance prévue</h2><p>${E.sent?"Ton coach n’a rien prévu ce jour-là.":"Ton coach n’a pas encore envoyé ton programme. Regarde tes messages."}</p></div>`+re;
+BN=[];BI="high";BP=cp.x.split("\n").map(x=>x.trim()).filter(Boolean);if(!BP.length)BP=[cp.t];if(c.ok&&!c.log)B=B||{rpe:5,n:{},t:{},s:{},pl:{},pa:{}};
+h+=ccard(cp,dd!==undefined&&dd!==1?"Ton coach a ajusté le volume du jour.":"",dd===undefined?1:dd);
+return h+(c.log?summ(c.log)+re:c.ok?`<div class="card"><h2 style="margin-top:0">Bilan de séance</h2><div id="bil">${bilH()}</div></div>`:`<button class="btn" data-a="ok">Valider la séance</button>`+re)}
+function planC(){cl();const E=ent(ME);return`<h1>Ton programme</h1>`+(E.sent&&E.prog.length?cprog():`<div class="card"><p>Ton coach n’a pas encore envoyé ton programme.</p></div>`)}
+function soirCOld(){cl();const E=ent(ME),wd=new Date().getDay(),mi=E.sent&&E.mental&&E.mental[wd]!=null?E.mental[wd]:-1,H=`<h1>Mental du soir</h1>`;
+if(mi<0)return H+`<div class="card"><p>${E.sent?"Pas d’exercice prévu ce soir.":"Ton coach n’a pas encore choisi tes exercices mentaux."}</p></div>`;
+return H+`<p class="mut">Choisi par ton coach. Série en cours : ${streak()} jour${streak()>1?"s":""}.</p>`+exCard(M((E.prof&&E.prof.ev)||"100 m")[mi],S.me[dk()])}
+function coachTab(){cl();const E=ent(ME);return`<h1>Mon coach</h1><div class="card"><b>Ton coach</b><p class="mut" style="margin:4px 0 0">Ton coach t’envoie ici ton programme, tes exercices mentaux et ses consignes. Il voit ton état du matin et ton effort ressenti.</p></div><h2>Messages</h2>`+chat(E,"a")+`<input type="text" id="mx" placeholder="Écris à ton coach" style="margin:8px 0 0"><button class="btn" data-a="msg">Envoyer</button>`}
+function meC(){const p=S.p;return`<div class="hero"><div class="av">${esc(p.name[0].toUpperCase())}</div><div><div class="brand" style="font-size:28px;letter-spacing:.04em">${esc(p.name)}</div><div style="opacity:.8;font-size:14px">Suivi par ton coach</div></div></div><div class="tiles"><div class="tile"><b>${Object.keys(S.ck).length}</b><span>check-ins</span></div><div class="tile"><b>${Object.keys(S.me).length}</b><span>soirs mentaux</span></div><div class="tile"><b>${streak()}</b><span>jours de suite</span></div></div>${acctBtns()}<button class="btn alt" data-a="leave">Quitter mon coach</button>`}
+let AU={role:"a",c1:false,c2:false},aud=0,audOn=false;
+function authV(){$("#app").innerHTML=`<h1>Apex Sprint</h1><p class="mut">Pour essayer tout de suite, sans compte :</p><button class="btn" data-a="demo" data-v="a">Entrer comme athlète</button><button class="btn alt" data-a="demo" data-v="c">Entrer comme coach</button><h2 style="margin-top:26px">Ou crée un compte</h2><p class="mut">Maquette : rien n’est envoyé.</p><div class="card"><label class="f" style="margin-top:0">Adresse e-mail</label><input type="text" inputmode="email" data-f="aemail" value="${esc(D.aemail||"")}" autocomplete="email" style="margin-top:0"><label class="f">Mot de passe (6 caractères minimum)</label><input type="text" data-f="apw" value="${esc(D.apw||"")}" autocomplete="new-password" style="margin-top:0"><label class="f">Tu es</label><div class="row"><button type="button" class="seg ${AU.role==="a"?"on":""}" data-a="aurole" data-v="a">Athlète</button><button type="button" class="seg ${AU.role==="c"?"on":""}" data-a="aurole" data-v="c">Coach</button></div></div>
+<div class="card"><button type="button" class="chip ${AU.c1?"on":""}" data-a="chk" data-v="c1" style="width:100%;text-align:left;border-radius:12px">J’accepte les conditions d’utilisation et la politique de confidentialité</button><button type="button" class="chip ${AU.c2?"on":""}" data-a="chk" data-v="c2" style="width:100%;text-align:left;border-radius:12px;margin-top:8px">J’accepte que mes données de santé (sommeil, douleur, forme) servent à mon suivi. Je peux retirer cet accord à tout moment.</button><p class="mut" style="margin:10px 0 0">Si tu as moins de 18 ans, un représentant légal doit accepter pour toi.</p></div><div class="err" id="aerr"></div><button class="btn" data-a="authgo">Créer mon compte</button><button class="btn alt" data-a="tab" data-v="legal">Lire la confidentialité</button>`}
+function legalV(inline){const c=(t,x)=>`<div class="card"><b>${t}</b><p class="mut" style="margin:6px 0 0">${x}</p></div>`;
+return(inline?`<h2>Confidentialité et conditions</h2>`:`<button class="btn alt" data-a="tab" data-v="${S.p?"me":"today"}" style="margin:0 0 10px">Retour</button><h1>Confidentialité et mes droits</h1>`)+
+c("Ce que nous collectons","Ton profil sportif, ton état du matin (sommeil, énergie, humeur, stress, douleur), tes bilans de séance, tes messages. Ce sont des données de santé : nous ne les utilisons qu’avec ton consentement explicite.")+
+c("Qui voit quoi","Tu vois tes données. Ton coach voit celles que tu partages avec lui en saisissant son code. Les notes privées qu’il écrit sur toi ne te sont pas montrées. Nous ne vendons pas tes données.")+
+c("Tes droits","Tu peux accéder à tes données, les corriger, les exporter, les supprimer et retirer ton consentement. Dans l’application : Profil, puis « Exporter mes données » ou « Supprimer mon compte ».")+
+c("Durée de conservation","À définir avant la mise en ligne. Tu pourras supprimer tes données à tout moment.")+
+c("Un outil d’aide à l’entraînement","Apex Sprint ne remplace ni un médecin ni un entraîneur. En cas de douleur persistante, consulte un professionnel de santé.")+
+`<p class="mut">Textes modèles à faire valider par un juriste avant toute publication.</p>`}
+function plansV(role){const P=S.plan,PC=S.planC,sel=role==="c"?PC:P,at=role==="c"?"data-c":"data-a";
+const card=(id,t,pr,l,hot)=>`<div class="card" style="${sel===id?"border-color:var(--or);border-width:2px":""}">${hot?`<span class="tag">Le plus choisi</span>`:""}<p style="margin:6px 0 0;font-size:18px"><b>${t}</b></p><div style="font:700 30px/1.1 'Barlow Condensed','Arial Narrow',sans-serif;margin:4px 0">${pr}</div><ul style="padding-left:18px;margin:8px 0">${l.map(x=>`<li>${x}</li>`).join("")}</ul><button class="${sel===id?"btn alt":"btn"}" ${at}="pick" data-v="${id}">${sel===id?"Offre choisie":"Choisir cette offre"}</button></div>`;
+return(role==="c"?"":`<button class="btn alt" data-a="tab" data-v="me" style="margin:0 0 10px">Retour</button>`)+`<h1>${role==="c"?"Offres coach":"Mon abonnement"}</h1><div class="warn" style="border:1px dashed var(--or);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--mut);margin:10px 0">Démo : aucun paiement n’est actif. Prix donnés à titre d’exemple. En version finale, le paiement passe par Stripe, avec 14 jours d’essai.</div>`+
+(role==="c"?card("cs","Starter","19 € / mois",["Jusqu’à 5 athlètes","Programmes, messages, notes privées","Propositions de l’outil (toi seul les vois)"])+card("cp","Pro","39 € / mois",["Jusqu’à 15 athlètes","Tout Starter"],1)+card("cc","Club","69 € / mois",["Jusqu’à 30 athlètes","Tout Pro","Plusieurs coachs (bientôt)"]):
+card("g","Gratuit","0 €",["Plan de base sur 4 semaines","Check-in du matin","2 exercices mentaux","Bilan de séance"])+card("p","Premium","9,99 € / mois",["Ajustements quotidiens complets","16 exercices mentaux avec lecteur guidé","Suivi de tes progrès"],1)+`<p class="mut">Si tu as un coach, ton accès peut être inclus dans son abonnement : règle à confirmer.</p>`)}
+const acctBtns=()=>`<button class="btn alt" data-a="tab" data-v="plans">Mon abonnement</button><button class="btn alt" data-a="tab" data-v="legal">Confidentialité et mes droits</button><button class="btn alt" data-a="export">Exporter mes données</button><button class="btn alt" data-a="logout">Se déconnecter</button><button class="btn alt" data-a="delacc">Supprimer mon compte</button>`;
+async function exportData(){const {notes,...E}=C.a[ME]||{};const data=JSON.stringify({exporte:new Date().toISOString(),compte:S.acct?{email:S.acct.email,role:S.acct.role}:null,profil:S.p,checkins:S.ck,soirs_mentaux:S.me,echanges_avec_coach:E},null,1);
+try{const d=window.claude&&await claude.use("downloads");if(d){await d.save({filename:"apex-sprint-mes-donnees.json",data});return}}catch(e){}
+$("#app").insertAdjacentHTML("beforeend",`<div class="card"><b>Tes données</b><textarea rows="8" style="width:100%;margin-top:8px">${esc(data)}</textarea><p class="mut">Copie ce texte pour le conserver.</p></div>`)}
+let AC0=null;const AC=()=>AC0||(AC0=new(window.AudioContext||window.webkitAudioContext)());
+function tone(f,d,t0,g,e){const a=AC(),n=a.currentTime+(t0||0),o=a.createOscillator(),v=a.createGain();o.frequency.setValueAtTime(f,n);if(e&&e!==f)o.frequency.linearRampToValueAtTime(e,n+d);v.gain.setValueAtTime(.0001,n);v.gain.exponentialRampToValueAtTime(g||.2,n+.03);v.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(v);v.connect(a.destination);o.start(n);o.stop(n+d+.05)}
+const bell=()=>{tone(528,2.6,0,.25);tone(1056,1.8,0,.07)},beeps=(n,f)=>{for(let i=0;i<n;i++)tone(f,.15,i,.2)},endBeeps=()=>{for(let i=0;i<4;i++)tone(660,.12,i,.2);tone(440,.5,4,.25)};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const say=t=>new Promise(r=>{if(!window.speechSynthesis){r();return}const u=new SpeechSynthesisUtterance(t);u.lang="fr-FR";u.rate=.85;u.onend=r;u.onerror=r;speechSynthesis.speak(u)});
+function stopAud(){aud++;window._snd=false;try{speechSynthesis.cancel()}catch(e){}}
+async function playEx(name){const ev=(ent(ME).prof&&ent(ME).prof.ev)||(S.p&&S.p.ev)||"100 m",m=M(ev).find(x=>x.n===name);if(!m)return;stopAud();const id=++aud,ok=()=>aud===id;window._snd=true;
+try{AC().resume();if(window.speechSynthesis)speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+beeps(3,880);await wait(3300);if(!ok())return;bell();await wait(2200);await say(m.n+". "+m.goal);await wait(1500);
+for(const s of m.s){if(!ok())return;await say(s);if(!ok())return;await wait(7000)}
+if(m.b&&ok()){await say("Suis le son. Il monte, tu inspires. Il descend, tu expires.");const T2=Math.min(m.b[2],120);breath(m.b[0],m.b[1],T2);await wait(T2*1000);if(ok()){endBeeps();await wait(5000)}}
+if(ok()){bell();await say("Exercice terminé. Bonne soirée.")}window._snd=false}
+let MX=null,MC="Me calmer";const PL={on:false,paused:false,skip:0,voice:true,tok:0,m:null,i:0};
+const CATS=["Me calmer","Me concentrer","Prendre confiance","Visualiser","Récupérer et dormir","Activation"],$e=id=>document.getElementById(id),evNow=()=>(ent(ME).prof&&ent(ME).prof.ev)||(S.p&&S.p.ev)||"100 m";
+function recoIdx(){const wd=new Date().getDay(),c=S.ck[dk()];if(c&&c.v.st>=4)return 7;if(c&&c.v.sl<=2)return 14;if(S.p.ph==="comp")return wd%2?13:2;return wd}
+function mentalV(ev,reco,coach){const L=M(ev),r=L[reco];
+if(MX!=null&&L[MX]){const m=L[MX],br2=m.steps.some(s=>s.b);return`<button class="btn alt" data-a="mback" style="margin:0 0 10px">Retour</button><h1>${esc(m.n)}</h1><p class="mut">${m.c}, environ ${m.min} min</p><div class="card"><p style="margin:0">${m.goal}</p><p class="mut">${m.why}</p>${br2?`<p class="mut">Respire calmement. Si tu as des vertiges, reprends une respiration normale.</p>`:""}${voiceCard()}<button class="btn" data-a="mstart" data-v="${MX}">Commencer</button><details style="margin-top:12px"><summary>Lire le texte</summary><ol>${m.steps.map(s=>`<li>${esc(s.t)}</li>`).join("")}</ol></details></div>`}
+let h=`<h1>Mental</h1><p class="mut">${streak()?"Série en cours : "+streak()+" jour"+(streak()>1?"s":"")+".":"Quelques minutes pour garder ton calme et ta confiance."}</p><div class="card"><span class="tag">${coach?"Choisi par ton coach":"Conseillé ce soir"}</span><p style="margin:8px 0 0;font-size:20px"><b>${esc(r.n)}</b></p><p class="mut" style="margin:4px 0">${r.goal} Environ ${r.min} min.</p><button class="btn" data-a="mstart" data-v="${reco}">Commencer</button></div>`;
+if(!coach)h+=`<div class="sec" style="margin-top:16px">Ou choisis ce dont tu as besoin</div><div class="row">${CATS.map(c=>`<button class="chip ${MC===c?"on":""}" data-a="mcat" data-v="${c}">${c}</button>`).join("")}</div>`+L.map((m,i)=>m.c===MC?`<button class="lr" data-a="mopen" data-v="${i}"><span><b>${esc(m.n)}</b><br><span class="mut">${m.min} min</span></span></button>`:"").join("")+`<p class="mut">Ces exercices t’aident à gérer ton stress et ta concentration. Ils ne remplacent pas un psychologue : en cas de mal-être, parles-en à un professionnel.</p>`;
+return h}
+function soir(){if(S.p.coach)return soirC();return mentalV(S.p.ev||"100 m",recoIdx(),false)}
+function soirC(){cl();const E=ent(ME),wd=new Date().getDay(),mi=E.sent&&E.mental&&E.mental[wd]!=null?E.mental[wd]:-1;
+if(mi<0)return`<h1>Mental</h1><div class="card"><p>${E.sent?"Pas d’exercice prévu ce soir.":"Ton coach n’a pas encore choisi tes exercices mentaux."}</p></div>`;return mentalV(evNow(),mi,true)}
+function playerShell(){const m=PL.m;return`<p class="mut" style="margin:0">${m.c}</p><h2 style="margin:4px 0 12px">${esc(m.n)}</h2><div class="card" id="plcard" style="text-align:center"><div id="pt" style="font-size:20px;line-height:1.4;min-height:84px">Prépare-toi…</div><div class="bc" id="bc" style="display:none"></div><p class="mut" id="bn" style="min-height:22px"></p><div class="bar2"><i id="bp" style="width:0"></i></div><div class="row" style="margin-top:12px"><button class="seg" data-a="pcmd" data-v="prev">Précédent</button><button class="seg on" id="pp" data-a="pcmd" data-v="pause">Pause</button><button class="seg" data-a="pcmd" data-v="next">Suivant</button></div><div class="row" style="margin-top:8px"><button class="seg" id="pv" data-a="pcmd" data-v="voice">Voix : oui</button><button class="seg" data-a="pcmd" data-v="stop">Arrêter</button></div></div>`}
+async function sl(ms,tok,tick){let t=0;while(t<ms){if(PL.tok!==tok||PL.skip)return false;if(!PL.paused){t+=200;if(tick)tick(Math.max(0,Math.ceil((ms-t)/1000)))}await wait(200)}return PL.tok===tok&&!PL.skip}
+const frVoices=()=>window.speechSynthesis?speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang)):[];
+const bestVoice=vs=>vs.find(v=>/natural|online|neural|google|amélie|amelie|thomas|audrey|marie|denise|henri|julie/i.test(v.name))||vs[0];
+function mkU(t){const u=new SpeechSynthesisUtterance(t),vs=frVoices(),sv=(S.vox&&S.vox.name)||"",v=vs.find(x=>x.name===sv)||bestVoice(vs);if(v){u.voice=v;u.lang=v.lang}else u.lang="fr-FR";u.rate=(S.vox&&S.vox.rate)||.9;return u}
+function voiceCard(){const vs=frVoices(),cur=(S.vox&&S.vox.name)||(bestVoice(vs)||{}).name||"",r=(S.vox&&S.vox.rate)||.9;
+return vs.length?`<div style="margin:12px 0"><b>Voix</b><select data-a="vox" style="margin-top:6px">${vs.map(v=>`<option value="${esc(v.name)}" ${v.name===cur?"selected":""}>${esc(v.name)}</option>`).join("")}</select><select data-a="vrate" style="margin-top:6px"><option value=".75" ${r===.75?"selected":""}>Lente</option><option value=".9" ${r===.9?"selected":""}>Normale</option><option value="1.05" ${r===1.05?"selected":""}>Rapide</option></select><button class="btn alt" data-a="vtest">Tester la voix</button></div>`:`<p class="mut">Aucune voix française trouvée sur cet appareil : l’exercice se fera avec les sons et le texte à l’écran.</p>`}
+const sayP=t=>new Promise(r=>{if(!PL.voice||!window.speechSynthesis){r();return}const u=mkU(t);u.onend=r;u.onerror=r;speechSynthesis.speak(u)});
+async function runBreath(b,tok){const bc=$e("bc");bc.style.display="grid";for(let c=1;c<=b.n;c++)for(const[lab,sec]of b.p){if(PL.tok!==tok||PL.skip)return;const up=lab.indexOf("Inspire")===0,dn=lab==="Expire";bc.textContent=lab;if(up||dn){bc.style.transition="transform "+sec+"s ease-in-out";bc.style.transform=up?(lab==="Inspire encore"?"scale(1.55)":"scale(1.35)"):"scale(.8)";tone(up?330:440,sec,0,.1,up?440:330)}$e("bn").textContent="Cycle "+c+" sur "+b.n;if(!await sl(sec*1000,tok))return}
+bc.style.display="none"}
+async function runPlayer(){const tok=++PL.tok,m=PL.m;PL.paused=false;PL.skip=0;
+try{AC().resume();if(window.speechSynthesis)speechSynthesis.speak(new SpeechSynthesisUtterance(""))}catch(e){}
+beeps(3,880);await sl(3300,tok);bell();await sl(1800,tok);
+for(let i=0;i<m.steps.length&&PL.tok===tok;i++){PL.i=i;const s=m.steps[i];PL.skip=0;
+$e("bp").style.width=Math.round(i/m.steps.length*100)+"%";$e("pt").textContent=s.t;$e("bc").style.display="none";$e("bn").textContent="";
+await sayP(s.t);if(PL.tok!==tok)return;
+if(!PL.skip){if(s.b)await runBreath(s.b,tok);else await sl((s.w||0)*1000,tok,r=>{$e("bn").textContent=r?r+" s":""})}
+if(PL.tok!==tok)return;if(PL.skip===-1)i=Math.max(-1,i-2);else if(!PL.skip)tone(523,.1,0,.12)}
+if(PL.tok!==tok)return;S.me[dk()]=true;save();endBeeps();bell();
+$e("plcard").innerHTML=`<p style="font-size:22px"><b>Bien joué.</b></p><p class="mut">Exercice terminé. Il compte dans ta série.</p><button class="btn" data-a="mend">Fermer</button>`}
+function plan(){if(S.p.coach)return planC();const p=S.p,ss=build(p),b=bfac(p),pre=p.inj.filter(x=>PRE[x]).map(x=>PRE[x]);
+const t2=p.ev==="200 m"?"150 m":p.ev==="400 m"?"300 m":"60 m";
+const need=`<div class="card"><b>Tests de référence, semaine 1</b><p class="mut" style="margin:6px 0 0">Après un bon échauffement et avec récupération complète : 30 m départ arrêté, 30 m lancé, saut en longueur sans élan, et ${t2} chronométré. Ils fixent tes allures cibles. Refais-les toutes les 4 semaines. Ce qu’il faut relever pendant chaque séance est indiqué en bas de la séance.</p></div>`;
+return`<h1>Ton plan</h1><p class="mut">${PH[p.ph]}, ${LV[p.lv][0].toLowerCase()}, ${p.spw} séances par semaine.</p>
+<div class="card"><b>${b.lab}</b><p class="mut" style="margin:6px 0 0">${PD[p.ph]} Le plan monte pendant 3 semaines, puis une semaine est plus légère.</p></div>`+need+ss.map(s=>`<div class="card"><b>${DN[s.day]}</b> <span class="mut">: ${esc(s.name)}</span>${sess(s,b.f,1,p,pre)}</div>`).join("")+
+(p.stO||p.wkO||p.injO?`<div class="card mut">Notés pour l’analyse à venir :${p.stO?`<br>Point fort : ${esc(p.stO)}`:""}${p.wkO?`<br>Point faible : ${esc(p.wkO)}`:""}${p.injO?`<br>Blessure ou gêne : ${esc(p.injO)}. Demande un avis à un kiné pour un renforcement adapté.`:""}</div>`:"")+`<p class="mut">Cette structure suit les principes classiques de périodisation. Fais-la valider par ton entraîneur avant de l’appliquer à la lettre.</p>`}
+function streak(){let n=0,d=new Date();while(S.me[d.toLocaleDateString("sv")]){n++;d.setDate(d.getDate()-1)}return n}
+function soirOld(){const p=S.p,wd=new Date().getDay(),m=M(p.ev)[wd],done=S.me[dk()];
+return`<h1>Mental du soir</h1><p class="mut">${DN[wd]} : ${m.min} minutes pour entraîner ton calme et ta concentration. Série en cours : ${streak()} jour${streak()>1?"s":""}.</p>
+<div class="card"><b style="font-size:18px">${m.n}</b><p class="mut">${m.goal}</p><ol>${m.s.map(x=>`<li>${x}</li>`).join("")}</ol>
+${m.b?`<div class="bc" id="bc">Prêt</div><p class="mut" style="text-align:center" id="btm">${m.b[2]} s</p><button class="btn alt" data-a="breath" data-v="${m.b.join(",")}">Lancer la respiration guidée</button>`:""}
+<button class="btn alt" data-a="play" data-n="${esc(m.n)}">Écouter la séance guidée</button>${done?`<p class="g"><b>Exercice terminé ce soir.</b></p>`:`<button class="btn" data-a="mdone">Marquer comme fait</button>`}</div>
+<div class="card mut">Version audio guidée : bientôt. Les consignes ci-dessus seront lues par une voix calme pour que tu puisses fermer les yeux.</div>`}
+function me(){if(S.p.coach)return meC();const p=S.p,pl=(a,o,c)=>a.length?a.map(x=>`<span class="tag ${c}">${esc(x==="Autre"?o||"Autre":x)}</span>`).join(" "):`<span class="mut">Aucun</span>`;
+return`<div class="hero"><div class="av">${esc(p.name[0].toUpperCase())}</div><div><div class="brand" style="font-size:28px;letter-spacing:.04em">${esc(p.name)}</div><div style="opacity:.8;font-size:14px">${p.ev}, ${LV[p.lv][0].toLowerCase()}, ${PH[p.ph].toLowerCase()}</div></div></div>
+<div class="tiles"><div class="tile"><b>${p.age}</b><span>ans</span></div><div class="tile"><b>${p.h}</b><span>cm</span></div><div class="tile"><b>${p.w}</b><span>kg</span></div></div>
+<div class="card"><div class="sec">Points forts</div><div class="row">${pl(p.st,p.stO,"g")}</div><div class="sec">À travailler</div><div class="row">${pl(p.wk,p.wkO,"o")}</div><div class="sec">Blessures et gênes</div><div class="row">${pl(p.inj,p.injO,"")}</div></div>
+<div class="card"><div class="sec">Ta force (max estimé)</div>${Object.keys(LN).map(k=>{const r=rm1(p,k);return`<div class="blk"><b>${LN[k]}</b> : ${r?Math.round(r)+" kg":"<span class=\"mut\">non renseigné</span>"}</div>`}).join("")}</div>
+<div class="tiles"><div class="tile"><b>${Object.keys(S.ck).length}</b><span>check-ins</span></div><div class="tile"><b>${Object.keys(S.me).length}</b><span>soirs mentaux</span></div><div class="tile"><b>${streak()}</b><span>jours de suite</span></div></div>
+${acctBtns()}<button class="btn" data-a="edit">Modifier mon profil</button><button class="btn alt" data-a="reset">Tout effacer</button>`}
+function render(){clearInterval(bt);stopAud();audOn=false;PL.tok++;PL.on=false;head();if(tab==="legal"){$("#app").innerHTML=legalV(false);return}if(!S.acct){authV();return}if(!S.p&&!editing&&path!=="tool"){path==="coach"?onboardC():gate();return}if(!S.p||editing){onboard();return}$("#app").innerHTML={today,plan,soir,coach:coachTab,me,plans:()=>plansV("a"),legal:()=>legalV(false)}[tab]()}
+function breath(i,o,tot){clearInterval(bt);const c=$("#bc");let el=0,ph=0,left=0;const set=()=>{const n=ph===0;c.textContent=n?"Inspire":"Expire";if(window._snd)tone(n?330:440,n?i:o,0,.1,n?440:330);c.style.transition=`transform ${n?i:o}s ease-in-out`;c.style.transform=n?"scale(1.35)":"scale(.8)";left=n?i:o};set();
+bt=setInterval(()=>{el++;left--;$("#btm").textContent=Math.max(0,tot-el)+" s";if(el>=tot){clearInterval(bt);c.textContent="Terminé";c.style.transform="scale(1)";return}if(left<=0){ph=1-ph;set()}},1000)}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||b.tagName==="SELECT")return;const a=b.dataset.a,v=b.dataset.v,g=b.dataset.g;
+if(a==="tab"){tab=v;render();scrollTo(0,0)}
+else if(a==="chip"){const arr=D[g],i=arr.indexOf(v);if(i>=0)arr.splice(i,1);else{arr.push(v);const o=g==="st"?"wk":g==="wk"?"st":null;if(o&&v!=="Autre")D[o]=D[o].filter(x=>x!==v)}sync()}
+else if(a==="seg"){D[g]=g==="spw"?+v:v;sync()}
+else if(a==="start"){const n=+D.age,h=+D.h,w=+D.w;let m="";if(!D.name.trim())m="Entre ton prénom.";else if(!(n>=10&&n<=80))m="Entre un âge entre 10 et 80 ans.";else if(!(h>=120&&h<=230))m="Entre une taille en cm (120 à 230).";else if(!(w>=30&&w<=150))m="Entre un poids en kg (30 à 150).";
+else if(["st","wk","inj"].some(x=>D[x].includes("Autre")&&!D[x+"O"].trim()))m="Précise ton choix « Autre » dans le champ qui apparaît.";
+else if(Object.keys(D.rm).some(k=>{const q=D.rm[k],a=+q.w,r=+q.r;return(q.w!==""||q.r!=="")&&!(a>=10&&a<=400&&Number.isInteger(r)&&r>=1&&r<=10)}))m="Pour chaque exercice de force, entre une charge (10 à 400 kg) et des répétitions (1 à 10), ou laisse les deux champs vides.";
+$("#err").textContent=m;if(m)return;const first=!editing;S.p={...D,name:D.name.trim(),age:n,h,w,start:(S.p&&S.p.start)||dk()};save();editing=false;tab=first?"plan":"me";render();scrollTo(0,0)}
+else if(a==="edit"){D=Object.assign(D0(),JSON.parse(JSON.stringify(S.p)));editing=true;render();scrollTo(0,0)}
+else if(a==="cancel"){editing=false;render()}
+else if(a==="pain"){draft.pain=v;document.querySelectorAll("[data-a=pain]").forEach(x=>x.classList.toggle("on",x.dataset.v===v))}
+else if(a==="run"){S.ck[dk()]={v:{...draft}};redo=false;save();render()}
+else if(a==="ok"){S.ck[dk()].ok=true;save();render()}
+else if(a==="keep"){S.ck[dk()].keep=true;save();render()}
+else if(a==="redo"){const c=S.ck[dk()];if(c)draft={...c.v};redo=true;render()}
+else if(a==="breath"){const x=v.split(",").map(Number);breath(x[0],x[1],x[2])}
+else if(a==="pl"){B.pl[b.dataset.i]=+v;rb()}
+else if(a==="allok"){BP.forEach((x,i)=>{B.pl[i]=2});rb()}
+else if(a==="bn"){B.n[b.dataset.i]=+v;rb()}
+else if(a==="bs"){B.s[b.dataset.k]=v;rb()}
+else if(a==="bsave")bsave();
+else if(a==="path"){path=v||null;render()}
+else if(a==="joinc"){joinCoach($("#lk").value.trim())}
+else if(a==="leave"){leaveCoach()}
+else if(a==="msg"){sendMsgA($("#mx").value.trim())}
+else if(a==="demo"){S.acct={email:"démo",role:v,at:new Date().toISOString()};save();render();if(v==="c")document.querySelector('#roles [data-r="c"]').click()}
+else if(a==="aurole"){AU.role=v;document.querySelectorAll("[data-a=aurole]").forEach(x=>x.classList.toggle("on",x.dataset.v===v))}
+else if(a==="chk"){b.classList.toggle("on",AU[v]=!AU[v])}
+else if(a==="authgo"){const em=(D.aemail||"").trim(),pw=D.apw||"";let m="";if(!/^\S+@\S+\.\S+$/.test(em))m="Entre une adresse e-mail valide.";else if(pw.length<6)m="Le mot de passe doit faire 6 caractères au moins.";else if(!AU.c1)m="Accepte les conditions et la confidentialité pour continuer.";else if(!AU.c2)m="Le consentement aux données de santé est nécessaire pour utiliser le suivi.";$("#aerr").textContent=m;if(m)return;S.acct={email:em,role:AU.role,at:new Date().toISOString()};D.apw="";save();render();if(AU.role==="c")document.querySelector('#roles [data-r="c"]').click()}
+else if(a==="pick"){checkout(v)}
+else if(a==="logout"){logout()}
+else if(a==="export"){exportData()}
+else if(a==="delacc"){deleteAccount()}
+else if(a==="play"){if(audOn){stopAud();audOn=false;b.textContent="Écouter la séance guidée";return}audOn=true;b.textContent="Arrêter l’audio";playEx(b.dataset.n).then(()=>{audOn=false;b.textContent="Écouter la séance guidée"}).catch(()=>{audOn=false})}
+else if(a==="mstart"){render();const m=M(evNow())[+v];if(!m)return;MX=null;PL.m=m;PL.on=true;PL.voice=true;$("#app").innerHTML=playerShell();runPlayer()}
+else if(a==="mopen"){MX=+v;render()}
+else if(a==="mback"){MX=null;render()}
+else if(a==="mcat"){MC=v;render()}
+else if(a==="mend"){MX=null;render()}
+else if(a==="pcmd"){const sp=()=>{try{speechSynthesis.cancel()}catch(x){}};if(v==="pause"){PL.paused=!PL.paused;try{PL.paused?speechSynthesis.pause():speechSynthesis.resume()}catch(x){}b.textContent=PL.paused?"Reprendre":"Pause"}else if(v==="voice"){PL.voice=!PL.voice;if(!PL.voice)sp();b.textContent="Voix : "+(PL.voice?"oui":"non")}else if(v==="next"){PL.skip=1;sp()}else if(v==="prev"){PL.skip=-1;sp()}else if(v==="stop"){PL.tok++;PL.on=false;stopAud();MX=null;render()}}
+else if(a==="vtest"){try{speechSynthesis.cancel();speechSynthesis.speak(mkU("Bonsoir. Voici ma voix pour ton exercice. Respire calmement."))}catch(x){}}
+else if(a==="mdone"){S.me[dk()]=true;save();render()}
+else if(a==="reset"){if(confirm("Effacer ton profil et tes données ?")){S={p:null,ck:{},me:{},acct:S.acct};path=null;save();D=D0();render()}}});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.f)D[t.dataset.f]=t.value;if(t.dataset.m){const m=t.dataset.m.split(".");D.rm[m[0]][m[1]]=t.value}if(t.dataset.r){draft[t.dataset.r]=+t.value;$("#v_"+t.dataset.r).textContent=t.value+"/5"}if(t.dataset.b==="rpe"){B.rpe=+t.value;$("#rv").textContent=t.value+"/10"}if(t.dataset.b==="t")B.t[t.dataset.i]=t.value;if(t.dataset.b==="pa")B.pa[t.dataset.i]=t.value;});
+document.addEventListener("change",e=>{const d=e.target.dataset.a;if(d==="sel"){sel=+e.target.value;render()}else if(d==="vox"){S.vox=S.vox||{};S.vox.name=e.target.value;save()}else if(d==="vrate"){S.vox=S.vox||{};S.vox.rate=+e.target.value;save()}});
+</script>
+<script>(()=>{
+let CODE="",ATHS=[],AD={};
+const OD=[1,2,3,4,5,6,0],TA="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;margin-top:8px";
+const prof=(E,ev)=>{const P=E.prof||(E.prof={ev:ev||"100 m",lv:"conf",ph:"spec",spw:4,st:[],wk:[],inj:[]});P.rm=P.rm||{sq:{w:"",r:""},ht:{w:"",r:""},rd:{w:"",r:""}};return P};
+const lv=a=>a.sc==null?"n":a.p==="vive"||a.sc<50?"r":a.sc<70||a.p==="légère"?"o":"g",LB={g:"En forme",o:"À surveiller",r:"Alerte",n:"Pas de check-in"};
+const dec=a=>ent(a.key).dec[dk()]!==undefined,pend=a=>a.adj&&ent(a.key).mode==="on"&&!dec(a);
+const fl=f=>f===0?"Repos":f===1?"Plan initial conservé":"Volume à "+Math.round(f*100)+" %";
+const spark=(v,mn,mx)=>v.length<2?`<p class="mut" style="margin:0">Pas encore assez de données.</p>`:`<svg viewBox="0 0 120 36" width="100%" height="44" role="img" aria-label="Courbe sur 7 jours"><polyline fill="none" stroke="#FF5A1F" stroke-width="2.5" stroke-linejoin="round" points="${v.map((y,i)=>[(i*120/(v.length-1)).toFixed(1),(34-(y-mn)/(mx-mn)*32).toFixed(1)].join(",")).join(" ")}"/></svg>`;
+function athObj(id){const X=AD[id],E=C.a[id],P=prof(E,"100 m"),ks=Object.keys(X.ck).sort().slice(-7),k=dk(),c=X.ck[k],d=c?decide(c.v):null,sj=E.prog.find(x=>+x.d===new Date().getDay());let adj=null;
+if(d&&E.mode==="on"){const ad=X.adj&&X.adj.d!==k&&(new Date(k)-new Date(X.adj.d))/864e5<=3?X.adj.f:1,f=c.v.pain==="vive"?0:{g:1,o:.75,r:.5}[d.lv]*ad;if(f!==1)adj={f,w:d.why+(c.v.pain!=="aucune"?" Douleur déclarée : "+c.v.pain+".":"")}}
+const lg=c&&c.log;return{key:id,n:X.name,ev:P.ev,ph:PH[P.ph],sc:d?d.score:null,p:c?c.v.pain:"aucune",s:sj?(sj.t||"Séance du coach"):"Pas de séance",c:ks.map(x=>decide(X.ck[x].v).score),r:ks.filter(x=>X.ck[x].log).map(x=>X.ck[x].log.rpe),adj,sens:lg?"Effort ressenti "+lg.rpe+"/10.":"Pas encore de bilan.",tool:lg&&lg.tool||[],done:lg&&lg.done||[],m:Object.keys(X.me).length}}
+function list(){ATHS=Object.keys(C.a).map(athObj);return ATHS}
+async function loadCoach(){const cc=await sb.from("coach_codes").select("code").eq("coach_id",UID).maybeSingle();CODE=cc.data?cc.data.code:"";
+const lk=await sb.from("coach_links").select("*").eq("coach_id",UID),links=lk.data||[],ids=links.map(l=>l.athlete_id);C={a:{}};AD={};if(!ids.length)return;
+const r=await Promise.all([sb.from("profiles").select("*").in("id",ids),sb.from("athlete_data").select("*").in("athlete_id",ids),sb.from("coach_data").select("*").in("athlete_id",ids),sb.from("coach_notes").select("*").eq("coach_id",UID).in("athlete_id",ids),sb.from("messages").select("*").eq("coach_id",UID).order("created_at",{ascending:true})]);
+const by=(q,k)=>{const o={};(q.data||[]).forEach(x=>{o[x[k]]=x});return o},P=by(r[0],"id"),A=by(r[1],"athlete_id"),Cd=by(r[2],"athlete_id"),N=by(r[3],"athlete_id");
+links.forEach(l=>{const id=l.athlete_id,d=(Cd[id]&&Cd[id].data)||{},n=N[id]||{};
+C.a[id]={notes:{obj:n.objective||"",rec:n.records||"",att:n.attention||"",priv:n.private||""},prog:d.prog||[],sent:!!d.sent,mode:l.tool_mode,msgs:[],dec:d.dec||{},link:true,mental:d.mental||{},prof:d.prof||null};
+const raw=(A[id]&&A[id].data)||{};AD[id]={ck:raw.ck||{},me:raw.me||{},adj:raw.adj,name:(P[id]&&P[id].name)||"Athlète"}});
+(r[4].data||[]).forEach(m=>{const e=C.a[m.athlete_id];if(e)e.msgs.push({f:m.sender_id===m.athlete_id?"a":"c",t:m.created_at,x:m.body})})}
+async function persist(id,what,x){if(!id)return;const E=C.a[id];let r;
+if(what==="data")r=await sb.from("coach_data").upsert({athlete_id:id,coach_id:UID,data:{prog:E.prog,sent:E.sent,mental:E.mental,prof:E.prof,dec:E.dec},updated_at:new Date().toISOString()});
+else if(what==="mode")r=await sb.from("coach_links").update({tool_mode:E.mode}).eq("athlete_id",id);
+else if(what==="notes")r=await sb.from("coach_notes").upsert({athlete_id:id,coach_id:UID,objective:E.notes.obj,records:E.notes.rec,attention:E.notes.att,private:E.notes.priv});
+else if(what==="msg")r=await sb.from("messages").insert({athlete_id:id,coach_id:UID,sender_id:UID,body:x});
+if(r&&r.error)alert("Enregistrement impossible : "+r.error.message)}
+async function refresh(){const before=JSON.stringify(C.a);await loadCoach();if(JSON.stringify(C.a)===before)return;
+const ch=document.getElementById("chat");if(cur&&ch){ch.outerHTML=chat(ent(cur),"c");return}
+const ae=document.activeElement;if(!(ae&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName))&&cur===null)cr()}
+const PR=a=>({...prof(ent(a.key),a.ev),start:dk()});
+let tab="team",cur=null;
+const row=a=>{const E=ent(a.key),l=E.msgs[E.msgs.length-1];return`<button class="lr" data-c="open" data-v="${esc(a.key)}"><span class="dot ${lv(a)}"></span><span><b>${esc(a.n)}</b><br><span class="mut">${a.ev}, ${esc(a.s)}</span>${pend(a)?`<br><span class="tag o">Ajustement à valider</span>`:dec(a)?`<br><span class="tag g">${fl(E.dec[dk()])}</span>`:""}${l&&l.f==="a"?`<br><span class="tag">Message de l’athlète</span>`:""}</span><span class="sc ${lv(a)}">${a.sc==null?"—":a.sc}</span></button>`};
+function team(){const L=list(),s=L.filter(a=>a.sc!=null),avg=s.length?Math.round(s.reduce((t,a)=>t+a.sc,0)/s.length):"—";
+return`<h1>Ton équipe</h1><p class="mut">Score de forme du matin, sur 100.</p><div class="tiles"><div class="tile"><b>${L.filter(pend).length}</b><span>à valider</span></div><div class="tile"><b class="r">${L.filter(a=>lv(a)==="r").length}</b><span>alertes</span></div><div class="tile"><b>${avg}</b><span>forme moyenne</span></div></div>`+(L.length?L.map(row).join(""):`<div class="card"><p>Aucun athlète pour l’instant.</p><p>Donne-leur ton code : <b>${CODE}</b></p></div>`)}
+function alerts(){const L=list(),g=(t,f)=>{const l=L.filter(f);return l.length?`<h2 style="margin-top:18px">${t}</h2>`+l.map(row).join(""):""};
+return`<h1>Alertes</h1><p class="mut">Triées par urgence.</p>`+(g("Urgent",a=>a.p==="vive")+g("À valider",a=>pend(a)&&a.p!=="vive")+g("À surveiller",a=>lv(a)==="o"&&!pend(a))||`<p>Aucune alerte.</p>`)}
+const invite=()=>`<h1>Inviter un athlète</h1><p class="mut">Donne ce code à ton athlète. Il le saisit à son inscription.</p><div class="code">${CODE}</div><button class="bt" data-c="copy">Copier le code</button><div class="card"><div class="sec">Une fois rattaché</div><p class="mut" style="margin:0">Tu renseignes son profil, tu composes son programme et ses exercices mentaux, tu lui écris. Lui ne voit que ce que tu lui envoies. Tu peux autoriser l’outil à te faire des propositions : tu es le seul à les voir.</p></div>`;
+const sg=(P,k,arr)=>`<div class="row">${arr.map(([v,l])=>`<button class="seg ${String(P[k])===String(v)?"on":""}" data-c="pf" data-k="${k}" data-v="${v}">${l}</button>`).join("")}</div>`;
+const ch=(P,k,arr)=>`<div class="row">${arr.map(x=>`<button class="chip ${P[k].includes(x)?"on":""}" data-c="pch" data-k="${k}" data-v="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
+function readAll(E){E.prog=E.prog.map((x,i)=>$("#pd"+i)?{d:+$("#pd"+i).value,t:$("#pt"+i).value,x:$("#px"+i).value}:x);E.mental=E.mental||{};OD.forEach(j=>{const s=$("#mn"+j);if(s)E.mental[j]=+s.value})}
+function detail(a){const E=ent(a.key),n=E.notes,P=prof(E,a.ev),on=E.mode==="on",pr=PR(a);
+let h=`<button class="bt alt" data-c="back" style="margin:0">Retour</button><div class="hero"><div class="av">${esc(a.n[0])}</div><div><div class="brand" style="color:inherit;font-size:24px;letter-spacing:.03em">${esc(a.n)}</div><div style="opacity:.8;font-size:14px">${a.ev}, ${a.ph.toLowerCase()}</div></div><div class="sc ${lv(a)}" style="font-size:36px">${a.sc==null?"—":a.sc}</div></div>
+<div class="card"><span class="tag ${lv(a)}">${LB[lv(a)]}</span> <span class="mut">Douleur déclarée : ${a.p}.</span><p class="mut" style="margin:8px 0 0">Séance prévue aujourd’hui : ${esc(a.s)}.</p><div class="sec" style="margin-top:12px">Forme sur 7 jours</div>${spark(a.c,0,100)}<div class="sec">Effort ressenti</div>${spark(a.r,1,10)}<p class="mut" style="margin:6px 0 0">${a.m} soirs mentaux faits.</p></div>
+<div class="card"><h2>Dernier bilan de l’athlète</h2><p style="margin:0">${esc(a.sens)}</p></div>${(a.done||[]).length?`<div class="card"><h2>Ce qui a été fait</h2>${a.done.map(d=>`<div class="blk"><b>${esc(d.t)}</b><br><span class="mut">${["Pas fait","En partie","Fait"][d.s]}${d.a?" : "+esc(d.a):""}</span></div>`).join("")}</div>`:""}
+<div class="card"><h2>Rôle de l’outil</h2><p class="mut" style="margin:0 0 8px">Autorises-tu l’outil à te proposer des programmes et des ajustements ? Tu es le seul à les voir. L’athlète ne reçoit que ce que tu envoies.</p><div class="row">${[["off","Non"],["on","Oui, il me propose"]].map(([v,l])=>`<button class="seg ${E.mode===v?"on":""}" data-c="mode" data-v="${v}">${l}</button>`).join("")}</div></div>`;
+if(on){h+=`<div class="card"><h2>Propositions de l’outil</h2><p class="mut">Visibles par toi seul.</p>`;
+if(!a.adj)h+=`<p class="mut">${a.sc==null?"Pas de check-in aujourd’hui.":"Aucun ajustement proposé aujourd’hui."}</p>`;
+else h+=`<div class="sec">Ajustement du jour : ${fl(a.adj.f)}</div><p class="mut" style="margin:0 0 6px">${esc(a.adj.w)}</p>`+(dec(a)?`<p><b class="g">Envoyé à l’athlète :</b> ${fl(E.dec[dk()])}.</p>`:"")+`<button class="bt" data-c="dec" data-v="ok">Valider et envoyer</button><button class="bt alt" data-c="dec" data-v="keep">Garder le plan</button><button class="bt alt" data-c="dec" data-v="rest">Repos</button><div class="sec" style="margin-top:14px">Ou un volume précis : <span id="cvl">80</span> %</div><input type="range" id="cv" min="0" max="110" step="5" value="80"><button class="bt alt" data-c="dec" data-v="custom">Envoyer ce volume</button>`;
+if(a.tool.length)h+=`<div class="sec" style="margin-top:14px">Analyse de la dernière séance</div>`+a.tool.map(x=>`<p class="mut" style="margin:2px 0">${esc(x)}</p>`).join("");
+h+=`<div class="sec" style="margin-top:14px">Plan de la semaine proposé</div>`+build(pr).map(s=>`<p class="mut" style="margin:2px 0"><b>${DN[s.day]}</b> : ${esc(s.name)}</p>`).join("")+`<button class="bt alt" data-c="imp">Importer dans mon programme</button></div>`}
+h+=`<div class="card"><h2>Profil sportif</h2><p class="mut">Tu renseignes les informations de ton athlète. Elles alimentent l’outil et restent dans ton espace.</p><div class="sec">Épreuve</div>${sg(P,"ev",["100 m","200 m","400 m"].map(x=>[x,x]))}<div class="sec">Niveau</div>${sg(P,"lv",[["deb","Débutant"],["conf","Confirmé"],["exp","Expert"]])}<div class="sec">Phase</div>${sg(P,"ph",[["prep","Préparation"],["spec","Spécifique"],["comp","Compétition"]])}<div class="sec">Séances par semaine</div>${sg(P,"spw",[[3,"3"],[4,"4"],[5,"5"]])}<div class="sec">Points faibles</div>${ch(P,"wk",AT)}<div class="sec">Blessures et gênes</div>${ch(P,"inj",INJ)}<div class="sec">Max en musculation (charge et répétitions)</div>${Object.keys(LN).map(k=>`<div class="row" style="align-items:center;margin-top:6px"><span style="flex:1.4;font-size:14px">${LN[k]}</span><input type="number" id="rw${k}" placeholder="kg" value="${esc(P.rm[k].w)}" style="flex:1;margin:0"><input type="number" id="rr${k}" placeholder="reps" value="${esc(P.rm[k].r)}" style="flex:1;margin:0"></div>`).join("")}<button class="bt" data-c="rm">Enregistrer les max</button></div>
+<div class="card"><h2>Programme</h2><p class="mut">Tu composes le programme. L’athlète le reçoit quand tu l’envoies.</p>${E.prog.map((x,i)=>`<div class="blk"><div class="row"><select id="pd${i}" style="flex:1;margin-top:0">${DN.map((d,j)=>`<option value="${j}" ${+x.d===j?"selected":""}>${d}</option>`).join("")}</select><input type="text" id="pt${i}" value="${esc(x.t)}" placeholder="Titre de la séance" style="flex:2;margin-top:0"></div><textarea id="px${i}" rows="4" style="${TA}">${esc(x.x)}</textarea><button class="bt alt" data-c="del" data-v="${i}">Supprimer</button></div>`).join("")}<button class="bt alt" data-c="add">Ajouter une séance</button></div>
+<div class="card"><h2>Exercices mentaux du soir</h2><p class="mut">Choisis un exercice de la bibliothèque pour chaque soir.</p>${OD.map(j=>`<div class="row" style="align-items:center;margin-top:6px"><span style="width:90px">${DN[j]}</span><select id="mn${j}" style="flex:1;margin-top:0"><option value="-1">Aucun</option>${M(P.ev).map((m,i)=>`<option value="${i}" ${(E.mental||{})[j]===i?"selected":""}>${esc(m.c)} : ${esc(m.n)} (${m.min} min)</option>`).join("")}</select></div>`).join("")}<button class="bt" data-c="send">Enregistrer et envoyer à l’athlète</button>${E.sent?`<span class="g"> Envoyé.</span>`:""}</div>
+<div class="card"><h2>Informations privées</h2><p class="mut">Visibles par toi seul. L’athlète ne les voit jamais.</p><label class="f">Objectif de saison</label><input type="text" id="n1" value="${esc(n.obj)}" style="margin-top:0"><label class="f">Records et tests</label><input type="text" id="n2" value="${esc(n.rec)}" style="margin-top:0"><label class="f">Points d’attention</label><input type="text" id="n3" value="${esc(n.att)}" style="margin-top:0"><label class="f">Notes privées</label><textarea id="n4" rows="4" style="${TA};margin-top:0">${esc(n.priv)}</textarea><button class="bt" data-c="notes">Enregistrer</button>${E.nok?`<span class="g"> Enregistré.</span>`:""}</div>
+<div class="card"><h2>Messages et consignes</h2>${chat(E,"c")}<input type="text" id="cm" placeholder="Écris à ${esc(a.n)}" style="margin:8px 0 0"><button class="bt" data-c="msg">Envoyer</button>${a.real?"":`<p class="mut">Athlète fictif : il ne répondra pas.</p>`}</div>`;return h}
+const account=()=>plansV("c")+legalV(true)+`<button class="bt alt" data-x="logout">Se déconnecter</button><button class="bt alt" data-x="delacc">Supprimer mon compte</button>`;
+function cr(){cl();document.querySelectorAll("#cnav button").forEach(b=>b.classList.toggle("on",b.dataset.v===tab&&cur===null));const a=cur&&list().find(x=>x.key===cur);$("#capp").innerHTML=`<div class="brand" style="margin:0 0 6px">APEX SPRINT, ESPACE COACH</div>`+(a?detail(a):{team,alerts,invite,account}[tab]())}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-c]");if(!b)return;const a=b.dataset.c,v=b.dataset.v,k=b.dataset.k,t=cur&&list().find(x=>x.key===cur),E=t&&ent(t.key),P=t&&prof(E,t.ev);
+if(E&&!["back","tab","open","copy","pick"].includes(a))readAll(E);
+let w="data";
+if(a==="tab"){tab=v;cur=null;w=""}else if(a==="open"){cur=v;w=""}else if(a==="back"){cur=null;w=""}
+else if(a==="pick"){checkout(v);return}
+else if(a==="dec"){E.dec[dk()]=v==="ok"?t.adj.f:v==="keep"?1:v==="rest"?0:+$("#cv").value/100}
+else if(a==="mode"){E.mode=v;w="mode"}
+else if(a==="pf"){P[k]=k==="spw"?+v:v}
+else if(a==="pch"){const i=P[k].indexOf(v);i>=0?P[k].splice(i,1):P[k].push(v)}
+else if(a==="rm"){Object.keys(LN).forEach(z=>{P.rm[z]={w:$("#rw"+z).value,r:$("#rr"+z).value}})}
+else if(a==="add"){E.prog.push({d:1,t:"",x:""})}
+else if(a==="del"){E.prog.splice(+v,1)}
+else if(a==="imp"){const p=PR(t),bb=bfac(p);build(p).forEach(s=>E.prog.push({d:s.day,t:s.name,x:s.blocks.map(z=>z.t+" : "+fmt(sc(z.n,bb.f),z.u)+(z.l?lt(z,p):"")).join("\n")}))}
+else if(a==="send"){E.sent=true}
+else if(a==="notes"){E.notes={obj:$("#n1").value,rec:$("#n2").value,att:$("#n3").value,priv:$("#n4").value};E.nok=true;w="notes"}
+else if(a==="msg"){const x=$("#cm").value.trim();if(!x)return;E.msgs.push({f:"c",t:new Date().toISOString(),x});await persist(t.key,"msg",x);w=""}
+else if(a==="copy"){try{navigator.clipboard.writeText(CODE);b.textContent="Code copié"}catch(x){b.textContent="Copie le code affiché"}return}
+if(w)await persist(t?t.key:null,w);
+cr();if(a==="tab"||a==="open"||a==="back")scrollTo(0,0)});
+document.addEventListener("input",e=>{if(e.target.id==="cv")$("#cvl").textContent=e.target.value});
+window.APX={start:async()=>{await loadCoach();cr()},refresh};
+})();
+</script>
+<script>
+/* ===== Plateforme : connexion, données, messages, paiement ===== */
+const GX=document.getElementById("gate");
+let sb=null,UID=null,PROF=null,LINK=null,SUB=null,AEMAIL="",GM="in",GA={role:"a",c1:false,c2:false},POLL=null,saveT=null;
+const cfg=()=>{try{return JSON.parse(localStorage.getItem("apexcfg")||"{}")}catch(e){return{}}};
+const errFr=m=>/Invalid login/i.test(m)?"E-mail ou mot de passe incorrect.":/not confirmed/i.test(m)?"Confirme d’abord ton e-mail (regarde ta boîte mail).":/already registered/i.test(m)?"Cet e-mail a déjà un compte. Connecte-toi.":/Password should/i.test(m)?"Le mot de passe est trop court (6 caractères minimum).":m;
+function gview(h){$("#ath").hidden=true;$("#coach").hidden=true;GX.hidden=false;GX.innerHTML=`<div class="top"><span class="brand">APEX SPRINT</span></div>`+h}
+function cfgV(m){const c=cfg(),p=c.prices||{};gview(`<h1>Connexion à ta base de données</h1><p class="mut">Colle les deux informations de ton projet Supabase (Project Settings, puis API).</p><div class="card"><label class="f" style="margin-top:0">Project URL</label><input type="text" id="g_url" value="${esc(c.url||"")}" style="margin-top:0" placeholder="https://xxxx.supabase.co"><label class="f">Clé « anon public »</label><input type="text" id="g_key" value="${esc(c.key||"")}" style="margin-top:0"><details style="margin-top:12px"><summary>Paiement (facultatif)</summary><p class="mut">Identifiants de prix Stripe.</p>${[["p","Premium athlète"],["cs","Coach Starter"],["cp","Coach Pro"],["cc","Coach Club"]].map(([k,l])=>`<label class="f">${l}</label><input type="text" id="g_${k}" value="${esc(p[k]||"")}" style="margin-top:0" placeholder="price_...">`).join("")}</details><div class="err">${m||""}</div><button class="btn" data-x="savecfg">Enregistrer</button></div>`)}
+function loginV(m){const up=GM==="up";gview(`<h1>${up?"Créer un compte":"Connexion"}</h1><div class="card">${up?`<label class="f" style="margin-top:0">Ton prénom</label><input type="text" id="g_name" style="margin-top:0" autocomplete="given-name">`:""}<label class="f"${up?"":' style="margin-top:0"'}>Adresse e-mail</label><input type="text" id="g_email" inputmode="email" autocomplete="email" style="margin-top:0"><label class="f">Mot de passe</label><input type="password" id="g_pw" autocomplete="${up?"new-password":"current-password"}" style="margin-top:0">${up?`<label class="f">Tu es</label><div class="row"><button type="button" class="seg ${GA.role==="a"?"on":""}" data-x="role" data-v="a">Athlète</button><button type="button" class="seg ${GA.role==="c"?"on":""}" data-x="role" data-v="c">Coach</button></div><button type="button" class="chip ${GA.c1?"on":""}" data-x="chk" data-v="c1" style="width:100%;text-align:left;border-radius:12px;margin-top:12px">J’accepte les conditions et la politique de confidentialité</button><button type="button" class="chip ${GA.c2?"on":""}" data-x="chk" data-v="c2" style="width:100%;text-align:left;border-radius:12px;margin-top:8px">J’accepte que mes données de santé (sommeil, douleur, forme) servent à mon suivi. Je peux retirer cet accord à tout moment.</button><details style="margin-top:12px"><summary>Lire la confidentialité</summary>${legalV(true)}</details>`:""}<div class="err" id="g_err">${m||""}</div><button class="btn" data-x="${up?"signup":"login"}">${up?"Créer mon compte":"Se connecter"}</button><button class="btn alt" data-x="mode">${up?"J’ai déjà un compte":"Créer un compte"}</button></div><p class="mut"><a href="#" data-x="resetcfg">Changer la base de données</a></p>`)}
+const subPlan=(s,coach)=>{if(!s||!/^(active|trialing)$/.test(s.status||""))return null;const m=coach?{coach_starter:"cs",coach_pro:"cp",coach_club:"cc"}:{premium:"p"};return m[s.plan]||null};
+async function checkout(id){if(id==="g")return;const pid=(cfg().prices||{})[id];if(!pid){alert("Le paiement n’est pas encore configuré (identifiants de prix manquants).");return}const r=await sb.functions.invoke("create-checkout",{body:{priceId:pid}});if(r.error||!r.data||!r.data.url){alert("Impossible d’ouvrir le paiement.");return}location.href=r.data.url}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function deleteAccount(){if(!confirm("Supprimer ton compte et toutes tes données ? Cette action est définitive."))return;const r=await sb.rpc("delete_my_account");if(r.error){alert("Suppression impossible : "+r.error.message);return}await sb.auth.signOut();location.reload()}
+document.addEventListener("click",async e=>{const b=e.target.closest("[data-x]");if(!b)return;if(e.preventDefault)e.preventDefault();const x=b.dataset.x,v=b.dataset.v,g=id=>{const el=document.getElementById(id);return el?el.value.trim():""},er=m=>{const el=document.getElementById("g_err");if(el)el.textContent=m};
+try{
+if(x==="savecfg"){const url=g("g_url"),key=g("g_key");if(!/^https:\/\//.test(url)||key.length<20){cfgV("Vérifie l’adresse (https://…) et la clé.");return}const prices={};["p","cs","cp","cc"].forEach(k=>{if(g("g_"+k))prices[k]=g("g_"+k)});localStorage.setItem("apexcfg",JSON.stringify({url,key,prices}));location.reload()}
+else if(x==="resetcfg"){cfgV()}
+else if(x==="mode"){GM=GM==="in"?"up":"in";loginV()}
+else if(x==="role"){GA.role=v;document.querySelectorAll("[data-x=role]").forEach(y=>y.classList.toggle("on",y.dataset.v===v))}
+else if(x==="chk"){b.classList.toggle("on",GA[v]=!GA[v])}
+else if(x==="login"){const r=await sb.auth.signInWithPassword({email:g("g_email"),password:document.getElementById("g_pw").value});if(r.error){er(errFr(r.error.message));return}await afterLogin(r.data.user)}
+else if(x==="signup"){const name=g("g_name"),email=g("g_email"),pw=document.getElementById("g_pw").value;
+if(!name){er("Entre ton prénom.");return}if(!/^\S+@\S+\.\S+$/.test(email)){er("Entre une adresse e-mail valide.");return}if(pw.length<6){er("Le mot de passe doit faire 6 caractères au moins.");return}
+if(!GA.c1){er("Accepte les conditions et la confidentialité pour continuer.");return}if(!GA.c2){er("L’accord sur les données de santé est nécessaire pour le suivi.");return}
+const r=await sb.auth.signUp({email,password:pw,options:{data:{role:GA.role==="c"?"coach":"athlete",name,health:"true"}}});if(r.error){er(errFr(r.error.message));return}
+if(r.data.session)await afterLogin(r.data.user);else{GM="in";loginV("Compte créé. Confirme ton e-mail (regarde ta boîte mail), puis connecte-toi.")}}
+else if(x==="logout"){await logout()}
+else if(x==="delacc"){await deleteAccount()}
+}catch(err){er(err.message)}});
+async function afterLogin(user){UID=user.id;AEMAIL=user.email||"";const p=await sb.from("profiles").select("*").eq("id",UID).maybeSingle();PROF=p.data;
+if(!PROF){loginV("Profil introuvable. Le fichier schema.sql a-t-il bien été exécuté dans Supabase ?");return}
+const sp=await sb.from("subscriptions").select("*").eq("user_id",UID).maybeSingle();SUB=sp.data||null;GX.hidden=true;
+if(PROF.role==="coach"){$("#ath").hidden=true;$("#coach").hidden=false;S.planC=subPlan(SUB,true);await window.APX.start()}
+else{await loadAthlete();$("#coach").hidden=true;$("#ath").hidden=false;render()}
+clearInterval(POLL);POLL=setInterval(()=>{PROF.role==="coach"?window.APX.refresh():pollA()},7000)}
+async function loadAthlete(){const ad=await sb.from("athlete_data").select("data").eq("athlete_id",UID).maybeSingle(),lk=await sb.from("coach_links").select("*").eq("athlete_id",UID).maybeSingle();
+S=Object.assign({p:null,ck:{},me:{}},(ad.data&&ad.data.data)||{});S.ck=S.ck||{};S.me=S.me||{};S.acct={email:AEMAIL,role:"a"};LINK=lk.data||null;S.plan=subPlan(SUB,false)||"g";
+await loadAthleteCoach();
+if(LINK&&(!S.p||!S.p.coach))S.p={name:PROF.name,coach:true,ev:"100 m",ph:"spec",lv:"conf",spw:4,st:[],wk:[],inj:[],rm:{},start:dk()};
+if(!LINK&&S.p&&S.p.coach)S.p=null}
+async function loadAthleteCoach(){C={a:{}};const E=ent(ME);if(!LINK)return;
+const cd=await sb.from("coach_data").select("data").eq("athlete_id",UID).maybeSingle(),d=(cd.data&&cd.data.data)||{},ms=await sb.from("messages").select("*").eq("athlete_id",UID).order("created_at",{ascending:true});
+Object.assign(E,{prog:d.prog||[],sent:!!d.sent,mental:d.mental||{},prof:d.prof||null,dec:d.dec||{},mode:LINK.tool_mode,link:true,msgs:(ms.data||[]).map(m=>({f:m.sender_id===UID?"a":"c",t:m.created_at,x:m.body}))})}
+function dbSave(){if(!sb||!UID||!PROF||PROF.role!=="athlete")return;clearTimeout(saveT);saveT=setTimeout(async()=>{const d=Object.assign({},S);delete d.acct;delete d.plan;const r=await sb.from("athlete_data").upsert({athlete_id:UID,data:d,updated_at:new Date().toISOString()});if(r.error)console.error(r.error)},500)}
+async function pollA(){if(!LINK)return;const before=JSON.stringify(C.a[ME]);await loadAthleteCoach();if(JSON.stringify(C.a[ME])===before)return;
+const ch=document.getElementById("chat");if(ch){ch.outerHTML=chat(ent(ME),"a");return}
+const ae=document.activeElement;if(ae&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName))return;if(["today","plan","soir","coach"].includes(tab)&&!PL.on)render()}
+async function joinCoach(code){const r=await sb.rpc("join_coach",{p_code:code});if(r.error){const el=$("#lke");if(el)el.textContent=/code inconnu/.test(r.error.message)?"Code inconnu. Vérifie-le auprès de ton coach.":r.error.message;return}
+const lk=await sb.from("coach_links").select("*").eq("athlete_id",UID).maybeSingle();LINK=lk.data;await loadAthlete();path=null;tab="today";render()}
+async function leaveCoach(){if(!confirm("Quitter ton coach ? Tu garderas tes données."))return;const r=await sb.rpc("leave_coach");if(r.error){alert(r.error.message);return}LINK=null;await loadAthlete();path=null;render()}
+async function sendMsgA(x){if(!x||!LINK)return;const r=await sb.from("messages").insert({athlete_id:UID,coach_id:LINK.coach_id,sender_id:UID,body:x});if(r.error){alert("Message non envoyé : "+r.error.message);return}await loadAthleteCoach();render()}
+async function boot(){const c=cfg();if(!c.url||!c.key){cfgV();return}
+if(typeof supabase==="undefined"){gview(`<h1>Connexion impossible</h1><p class="mut">Le module de connexion n’a pas pu se charger. Vérifie ta connexion internet et recharge la page.</p>`);return}
+sb=supabase.createClient(c.url,c.key);const s=await sb.auth.getSession();
+if(s.data&&s.data.session)await afterLogin(s.data.session.user);else loginV()}
+boot().catch(e=>gview(`<h1>Erreur</h1><p class="mut">${esc(e.message)}</p><button class="btn alt" data-x="resetcfg">Vérifier la configuration</button>`));
+</script></body></html>

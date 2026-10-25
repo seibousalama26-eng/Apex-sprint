@@ -1,0 +1,5 @@
+services:
+  - type: web
+    name: apex-sprint
+    runtime: static
+    staticPublishPath: .
